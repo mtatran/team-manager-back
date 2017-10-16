@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "outDir": "build",
+      "target": "es2017",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "rootDir": "src",
+      "forceConsistentCasingInFileNames": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "strictNullChecks": true,
+      "suppressImplicitAnyIndexErrors": true,
+      "noUnusedLocals": true,
+      "lib": ["es2015"]
+  },
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
+  ]
+}
