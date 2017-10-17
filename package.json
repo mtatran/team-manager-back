@@ -16,6 +16,10 @@
   "bugs": {
     "url": "https://github.com/teamwaterloop/team-manager-back/issues"
   },
+  "standard": {
+    "parser": "typescript-eslint-parser",
+    "plugins": [ "typescript" ]
+  },
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
     "@types/body-parser": "^1.16.5",
@@ -29,8 +33,10 @@
     "typeorm": "^0.1.0"
   },
   "devDependencies": {
+    "eslint-plugin-typescript": "^0.8.0",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
-    "typescript": "^2.5.3"
+    "typescript": "^2.5.3",
+    "typescript-eslint-parser": "^8.0.0"
   }
 }

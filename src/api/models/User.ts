@@ -5,7 +5,7 @@ import Team from './Team'
 @Entity()
 export default class User extends Base{
   @Column()
-  firstName: string
+  firstName: string;
 
   @Column()
   lastName: string

@@ -1,13 +1,19 @@
-import {Entity, Column, Index} from 'typeorm'
+import {Entity, Column, Index, JoinColumn, OneToOne} from 'typeorm'
 import Base from './Base'
+import Team from './Team'
+import User from './User'
 
 @Entity()
 @Index(['teamId', 'userId'])
 export default class UserTeam extends Base {
   @Column()
-  teamId: number
+  level: number
 
-  @Column()
-  userId: number
+  @OneToOne(type => Team)
+  @JoinColumn({name: 'teamId'})
+  team: Team
   
+  @OneToOne(type => User)
+  @JoinColumn({name: 'userId'})
+  user: User
 }
