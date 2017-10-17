@@ -1,11 +1,11 @@
-import {Entity, Column, ManyToMany} from 'typeorm'
+import { Entity, Column, ManyToMany } from 'typeorm'
 import Base from './Base'
 import Team from './Team'
 
 @Entity()
-export default class User extends Base{
+export default class User extends Base {
   @Column()
-  firstName: string;
+  firstName: string
 
   @Column()
   lastName: string

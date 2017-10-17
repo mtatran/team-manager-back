@@ -4,8 +4,10 @@
   "description": "Backend for team manager website",
   "main": "build/index.js",
   "scripts": {
-    "compile": "tsc && node build/index.js",
-    "dev": "nodemon | bunyan"
+    "build": "tsc",
+    "dev": "nodemon | bunyan",
+    "lint": "tslint --project .",
+    "lint:fix": "tslint --project . --fix"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,9 @@
   },
   "standard": {
     "parser": "typescript-eslint-parser",
-    "plugins": [ "typescript" ]
+    "plugins": [
+      "typescript"
+    ]
   },
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
@@ -30,13 +34,13 @@
     "express": "^4.16.2",
     "mysql": "^2.15.0",
     "reflect-metadata": "^0.1.10",
+    "tslint-config-standard": "^6.0.1",
     "typeorm": "^0.1.0"
   },
   "devDependencies": {
-    "eslint-plugin-typescript": "^0.8.0",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
-    "typescript": "^2.5.3",
-    "typescript-eslint-parser": "^8.0.0"
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3"
   }
 }

@@ -1,4 +1,4 @@
-import {Router} from 'express'
+import { Router } from 'express'
 import Users from './users'
 
 const router = Router()

@@ -1,4 +1,4 @@
-import {Entity, Column, Index, JoinColumn, OneToOne} from 'typeorm'
+import { Entity, Column, Index, JoinColumn, OneToOne } from 'typeorm'
 import Base from './Base'
 import Team from './Team'
 import User from './User'
@@ -12,7 +12,7 @@ export default class UserTeam extends Base {
   @OneToOne(type => Team)
   @JoinColumn({name: 'teamId'})
   team: Team
-  
+
   @OneToOne(type => User)
   @JoinColumn({name: 'userId'})
   user: User

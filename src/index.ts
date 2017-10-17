@@ -1,10 +1,10 @@
 import 'reflect-metadata'
 
 import * as express from 'express'
-import {Request, Response, NextFunction} from 'express'
+import { Request, Response, NextFunction } from 'express'
 import * as bodyParser from 'body-parser'
-import {createConnection} from 'typeorm'
-import {http} from './config'
+import { createConnection } from 'typeorm'
+import { http } from './config'
 import log from './utils/logger'
 import api from './api'
 

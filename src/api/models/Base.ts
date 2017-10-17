@@ -1,12 +1,13 @@
-import {CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn} from 'typeorm'
+import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm'
 
-export default class Base{
+export default class Base {
+
   @PrimaryGeneratedColumn()
   id: number
 
   @CreateDateColumn()
-  createDate: Date;
+  createDate: Date
 
   @UpdateDateColumn()
-  updateDate: Date;
+  updateDate: Date
 }
