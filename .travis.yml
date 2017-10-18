@@ -2,8 +2,9 @@ language: node_js
 node_js:
   - "stable"
 script:
-  - npm run build
-  - npm run lint
+  - yarn build
+  - yarn lint
 cache:
+  yarn: true
   directories:
     - node_modules
