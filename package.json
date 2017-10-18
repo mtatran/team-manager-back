@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
+    "start": "node build/index.js | bunyan",
     "dev": "nodemon | bunyan",
     "lint": "tslint --project .",
     "lint:fix": "tslint --project . --fix"

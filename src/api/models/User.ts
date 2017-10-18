@@ -1,6 +1,6 @@
-import { Entity, Column, ManyToMany } from 'typeorm'
+import { Entity, Column, OneToMany } from 'typeorm'
 import Base from './Base'
-import Team from './Team'
+import Position from './Position'
 
 @Entity()
 export default class User extends Base {
@@ -22,6 +22,6 @@ export default class User extends Base {
   @Column()
   email: string
 
-  @ManyToMany(type => Team)
-  teams: Team[]
+  @OneToMany(type => Position, (position: Position) => position.user)
+  positions: Position[]
 }
