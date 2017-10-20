@@ -17,7 +17,7 @@ app.use('/api', api)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   let statusCode: number = err.statusCode || 500
 
-  if(err.name === Error.name) {
+  if (err.name === Error.name) {
     return res.status(statusCode).json({message: err.message})
   }
   return res.status(statusCode).json(err)

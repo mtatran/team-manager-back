@@ -3,10 +3,10 @@ import { sign } from 'jsonwebtoken'
 
 import User from '../models/User'
 import Service from './Service'
-import {user as userConfig, auth as authConfig} from '../../config'
+import {user as userConfig, auth as authConfig } from '../../config'
 
-class UserService extends Service<User>{
-  constructor() {
+class UserService extends Service<User> {
+  constructor () {
     super(User)
   }
 
@@ -20,10 +20,10 @@ class UserService extends Service<User>{
 
   async findByLogin ( email: string, password: string ) {
     const user = await this.getRepo().findOne({ where: { email }})
-    if(!user) throw new Error('emailNotFound')
+    if (!user) throw new Error('emailNotFound')
 
     const passwordMatch = await compare(password, user.password)
-    if(!passwordMatch) throw new Error('incorrectPassword')
+    if (!passwordMatch) throw new Error('incorrectPassword')
 
     return user
   }

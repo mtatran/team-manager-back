@@ -12,4 +12,3 @@ export const presentUserFull = (user: User) => ({
   phoneNumber: user.phoneNumber,
   address: user.address
 })
-

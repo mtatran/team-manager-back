@@ -13,5 +13,4 @@ router.post('/login', passport.authenticate('local'), UserController.login)
 router.post('/signup', UserController.create)
 router.get('/profile', [isAuthenticated], UserController.getProfile)
 
-
 export default router

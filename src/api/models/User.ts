@@ -1,5 +1,5 @@
 import { Entity, Column, OneToMany } from 'typeorm'
-import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from "class-validator";
+import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './Base'
 import Position from './Position'
 
@@ -26,7 +26,7 @@ export default class User extends Base {
   @Column()
   address: string
 
-  @IsOptional()  
+  @IsOptional()
   @IsMobilePhone('en-CA')
   @Column()
   phoneNumber: string
@@ -35,9 +35,8 @@ export default class User extends Base {
   @Column()
   email: string
 
-  @Column("enum", { enum: Access })
+  @Column('enum', { enum: Access })
   access: Access
-
 
   @OneToMany(type => Position, (position: Position) => position.user)
   positions: Position[]
