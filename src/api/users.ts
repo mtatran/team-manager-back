@@ -1,25 +1,17 @@
 import { Router } from 'express'
-import { getConnection } from 'typeorm'
-import User from './models/User'
+import * as passport from 'passport'
+
+// Controllers
+import UserController from './controllers/UserController'
+
+// Policies
+import isAuthenticated from './policies/isAuthenticated'
 
 const router = Router()
 
-router.get('/create', async (req, res, next) => {
-  try {
+router.post('/login', passport.authenticate('local'), UserController.login)
+router.post('/signup', UserController.create)
+router.get('/profile', [isAuthenticated], UserController.getProfile)
 
-    const connection = getConnection()
-
-    const user = new User()
-    user.firstName = 'Tyler'
-    user.lastName = 'Zhang'
-    user.password = 'awfljdskkfs'
-
-    await connection.manager.save(user)
-  } catch (e) {
-    console.error(e)
-  }
-
-  res.json({message: 'done'})
-})
 
 export default router
