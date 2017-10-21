@@ -8,7 +8,9 @@
     "start": "node build/index.js | bunyan",
     "dev": "nodemon | bunyan",
     "lint": "tslint --project .",
-    "lint:fix": "tslint --project . --fix"
+    "lint:fix": "tslint --project . --fix",
+    "generateDocs": "apidoc -i src/ -o docs/",
+    "test:build": "yarn build && yarn lint"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,10 @@
     "plugins": [
       "typescript"
     ]
+  },
+  "apidoc": {
+    "title": "Waterloop Team Manager API",
+    "url" : "https://team-manager.teamwaterloop.ca/api"
   },
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
@@ -52,6 +58,7 @@
     "typeorm": "^0.1.0"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",

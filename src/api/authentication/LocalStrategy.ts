@@ -16,7 +16,6 @@ const callback = async (email: string, password: string, done: Function) => {
     } else if (e.message === 'incorrectPassword') {
       return done(null, false, { message: 'Incorrect password' })
     }
-
     done(e)
   }
 }
