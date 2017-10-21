@@ -10,17 +10,7 @@ cache:
     - node_modules
 env:
   global:
-    - secure: "TCg96mqTuhYs/fQEnV/nOb4D2k92eAYiGd0nDd/ysNJ+vKopymGbw2yHBdsFejQGm0F1rirD8EZxEZIC2ZEINU+wI9LpqzH4SeH1CqhMI1BXOXeBxG8cpoQQYmLZBHGhUo6jmIk1rRva/h1GzyLJo8klkS81EF/1bPn7bgEW445BB7VSCJSzxe0WR6jzXV0SvgrHd3GDhBeHXcA4+9OHVT52/ZyPlPA/A5tsso6wiD+0jQTGpvE3uWO56BOVNqXHorgyLU5e9uxTNXWz1q08bfKULe0j+90rAW7XIrWIlY2hd2kVn7xgGAomXTaP59ME1pdtsScAFfxY3nXap6k8p+7CkHFOZ/ffDYoQl13Ty4rqobkgoSgkuaSlCkmv4cZ4JpVdPHbvearD/6J4HW3DWIMkGSL5K3gHkvxsR1jeB04C82BWLxZa2GqwAYlMLQ6ALbQGMZL6n0KyqMoU2n4diYKJuJj6YLxWz2qFNanssqbNgLLC8A0O0xsUcvK0+uWnCcHaYJwOUBmRRWD1cM1drI/FEVogOm67QAu7tqqsXsjXHhM4o97Niu1w9zJLyFDnLRvENau4AxaUsPQgMgYGDkMDhbE1ULGPWw0yFPDYUNPdF4yg/wyr2xIVE02Oxa4D2wpldRsA/jjSOSxpN2kxSxviTtuRHUvwSEmlnpoOPAw="
+    - ENCRYPTION_LABEL: "4938fdfee2c5"
+    - COMMIT_AUTHOR_EMAIL: "tztylerzhang@gmail.com"
 after_success:
-  - |
-      # Set up ssh scripts with deploy key under .travis
-       $(npm bin)/set-up-ssh --key "$encrypted_4938fdfee2c5_iv" \
-                             --iv "$encrypted_4938fdfee2c5_key" \
-                             --path-encrypted-key ".travis/github_deploy_key.enc"
-  - |
-
-      $(npm bin)/update-branch --commands "yarn generateDocs" \
-                               --commit-message "Generate documentation [skip ci]" \
-                               --directory docs \
-                               --distribution-branch "gh-pages" \
-                               --source-branch "master"
+  - bash .travis/deploy.sh
