@@ -12,6 +12,11 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 initializeAuthentication(app)
 
+app.use((req, res, next) => {
+  req.context = req.context || {}
+  next()
+})
+
 app.use('/api', api)
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

@@ -28,13 +28,12 @@ class UserService extends Service<User> {
     return user
   }
 
-  createUserJwtToken = (user: User) => {
+  createUserJwtToken (user: User) {
     const jwtFields = {
       id: user.id,
       email: user.email,
       access: user.access
     }
-
     /**
      * @todo: decide on how long these tokens should last
      */

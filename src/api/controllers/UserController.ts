@@ -63,7 +63,7 @@ export default class UserController {
   }
 
   public static getProfile = (req: Request, res: Response) => {
-    const presented = UserPresentation.presentUserFull(req.user)
+    const presented = UserPresentation.fullUser(req.user)
     res.json(presented)
   }
 }

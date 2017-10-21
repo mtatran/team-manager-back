@@ -39,6 +39,6 @@ export default class User extends Base {
   access: Access
 
   @OneToMany(type => Position, (position: Position) => position.user)
-  positions: Position[]
+  positions: Promise<Position[]>
 
 }

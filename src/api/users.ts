@@ -53,4 +53,5 @@ router.post('/signup', UserController.signup)
  */
 router.get('/profile', [isAuthenticated], UserController.getProfile)
 
+
 export default router

@@ -11,7 +11,7 @@ import User from '../models/User'
  * @apiSuccess {String} address
  * @apiSuccess {ISODate} createDate
  */
-export const presentUserFull = (user: User) => ({
+export const fullUser = (user: User) => ({
   id: user.id,
   firstName: user.firstName,
   lastName: user.lastName,

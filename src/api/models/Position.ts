@@ -18,7 +18,7 @@ export default class Position extends Base {
   @JoinColumn()
   team: Team
 
-  @ManyToOne(type => User, user => user.positions)
+  @ManyToOne(type => User, user => user.positions, { eager: true })
   @JoinColumn()
   user: User
 }
