@@ -29,7 +29,7 @@
   },
   "apidoc": {
     "title": "Waterloop Team Manager API",
-    "url" : "https://team-manager.teamwaterloop.ca/api"
+    "url": "https://team-manager.teamwaterloop.ca/api"
   },
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
@@ -58,6 +58,7 @@
     "typeorm": "^0.1.0"
   },
   "devDependencies": {
+    "@alrra/travis-scripts": "^3.0.1",
     "apidoc": "^0.17.6",
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
