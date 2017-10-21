@@ -21,6 +21,6 @@ after_success:
 
       $(npm bin)/update-branch --commands "yarn generateDocs" \
                                --commit-message "Generate documentation [skip ci]" \
-                               --directory docs
+                               --directory docs \
                                --distribution-branch "gh-pages" \
                                --source-branch "master"
