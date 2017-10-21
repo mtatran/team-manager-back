@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - "stable"
+script:
+  - yarn build
+  - yarn lint
+cache:
+  yarn: true
+  directories:
+    - node_modules
+env:
+  global:
+    - ENCRYPTION_LABEL: "4938fdfee2c5"
+    - COMMIT_AUTHOR_EMAIL: "tztylerzhang@gmail.com"
+after_success:
+  - bash .travis/deploy.sh .travis/deploy_key.enc

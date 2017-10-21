@@ -1,0 +1,67 @@
+{
+  "name": "team-manager-back",
+  "version": "1.0.0",
+  "description": "Backend for team manager website",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js | bunyan",
+    "dev": "nodemon | bunyan",
+    "lint": "tslint --project .",
+    "lint:fix": "tslint --project . --fix",
+    "generateDocs": "apidoc -i src/ -o docs/",
+    "test:build": "yarn build && yarn lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teamwaterloop/team-manager-back.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teamwaterloop/team-manager-back/issues"
+  },
+  "standard": {
+    "parser": "typescript-eslint-parser",
+    "plugins": [
+      "typescript"
+    ]
+  },
+  "apidoc": {
+    "title": "Waterloop Team Manager API",
+    "url": "https://team-manager.teamwaterloop.ca/api"
+  },
+  "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.1",
+    "@types/body-parser": "^1.16.5",
+    "@types/bunyan": "^1.8.3",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.0.37",
+    "@types/jsonwebtoken": "^7.2.3",
+    "@types/passport": "^0.3.4",
+    "@types/passport-jwt": "^2.0.24",
+    "@types/passport-local": "^1.0.31",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.2",
+    "bunyan": "^1.8.12",
+    "class-validator": "^0.7.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mysql": "^2.15.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^3.0.0",
+    "passport-local": "^1.0.0",
+    "reflect-metadata": "^0.1.10",
+    "tslint-config-standard": "^6.0.1",
+    "typeorm": "^0.1.0"
+  },
+  "devDependencies": {
+    "apidoc": "^0.17.6",
+    "nodemon": "^1.12.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3"
+  }
+}
