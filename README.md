@@ -10,6 +10,8 @@
 
 Back end for managing the team
 
+**[Checkout the API documentation here](https://teamwaterloop.github.io/team-manager-back/)**
+
 ## Steps to run the project
 
 ### 1. Install Dependences

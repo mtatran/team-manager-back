@@ -12,7 +12,7 @@ const router = Router()
 /**
  * @api {POST} /users/login Login
  * @apiName login
- * @apiGroup users
+ * @apiGroup Users
  * @apiVersion  1.0.0
  *
  * @apiUse param_user_login
@@ -29,7 +29,7 @@ router.post('/login', passport.authenticate('local'), UserController.login)
 /**
  * @api {POST} /users/signup Signup
  * @apiName signup
- * @apiGroup users
+ * @apiGroup Users
  * @apiVersion  1.0.0
  *
  * @apiUse param_user_signup
@@ -46,7 +46,7 @@ router.post('/signup', UserController.signup)
 /**
  * @api {get} /users/profile Get Self Profile
  * @apiName getProfile
- * @apiGroup users
+ * @apiGroup Users
  * @apiVersion  1.0.0
  *
  * @apiUse success_user_full
