@@ -3,7 +3,8 @@ import { sign } from 'jsonwebtoken'
 
 import User from '../models/User'
 import Service from './Service'
-import {user as userConfig, auth as authConfig } from '../../config'
+import { user as userConfig, auth as authConfig } from '../../config'
+import { JwtToken } from '../../types'
 
 class UserService extends Service<User> {
   constructor () {
@@ -37,10 +38,10 @@ class UserService extends Service<User> {
   }
 
   createUserJwtToken (user: User) {
-    const jwtFields = {
+    const jwtFields: JwtToken = {
       id: user.id,
       email: user.email,
-      access: user.access
+      authority: user.authority
     }
     /**
      * @todo: decide on how long these tokens should last

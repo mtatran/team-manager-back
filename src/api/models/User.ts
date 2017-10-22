@@ -2,11 +2,9 @@ import { Entity, Column, OneToMany } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './Base'
 import Position from './Position'
+import { Authority } from '../../types'
 
-export enum Authority {
-  member = 'member',
-  admin = 'admin'
-}
+
 
 @Entity()
 export default class User extends Base {
