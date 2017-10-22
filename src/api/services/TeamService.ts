@@ -5,6 +5,15 @@ class TeamService extends service<Team> {
   constructor () {
     super(Team)
   }
+
+  joinAllDefinition = {
+    alias: "team",
+    leftJoinAndSelect: {
+      positions: "team.positions",
+      user: "positions.user"
+    }
+  }
+
 }
 
 export default new TeamService()

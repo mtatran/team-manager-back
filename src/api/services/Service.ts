@@ -1,8 +1,13 @@
-import { getRepository, Repository } from 'typeorm'
+import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
+
+interface queryOptions {
+  includeAll: boolean
+}
 
 export default class Service<T> {
   private repo: Repository<T>
+  joinAllDefinition = {}
 
   constructor (model: any) {
     this.repo = getRepository(model)
@@ -15,8 +20,35 @@ export default class Service<T> {
     await this.repo.save(obj)
   }
 
-  findOneById (id: Number) {
-    return this.repo.findOneById(id)
+  findOneById (id: Number, opts?: queryOptions ) {
+    return this.repo.findOneById(id, this.parseOpts(opts))
+  }
+
+  findMany (query: FindManyOptions<T>, opts?: queryOptions) {
+    const q: any = {
+      ...this.parseOpts(opts),
+      ...query
+    }
+    return this.repo.find(q)
+  }
+
+  findOne (query: FindOneOptions<T>, opts?: queryOptions) {
+    const q: any = {
+      ...this.parseOpts(opts),
+      ...query
+    }
+    return this.repo.findOne(q)
+  }
+
+  parseOpts (opts?: queryOptions): Object | undefined {
+    if(!opts) return undefined
+
+    let options: any = {}
+    if (opts.includeAll) {
+      options.join = this.joinAllDefinition
+    }
+
+    return options
   }
 
   getRepo = () => this.repo

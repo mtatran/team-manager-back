@@ -10,6 +10,14 @@ class UserService extends Service<User> {
     super(User)
   }
 
+  joinAllDefinition = {
+    alias: "user",
+    leftJoinAndSelect: {
+      positions: "user.positions",
+      team: "positions.team"
+    } 
+  }
+
   async save (user: User) {
     /**
      * @todo: Add password strength checker here
@@ -39,7 +47,6 @@ class UserService extends Service<User> {
      */
     return sign(jwtFields, authConfig.secret)
   }
-
 }
 
 export default new UserService()

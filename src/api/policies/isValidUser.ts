@@ -9,7 +9,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   }
 
   userId = parseInt(userId, 10)
-  const user = await UserService.findOneById(userId)
+  const user = await UserService.findOneById(userId, { includeAll: true })
 
   if (user) {
     req.context.user = user

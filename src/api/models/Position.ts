@@ -4,15 +4,15 @@ import Team from './Team'
 import User from './User'
 
 export enum PositionLevel {
-  member,
-  coLead,
-  lead
+  member = 'member',
+  coLead = 'coLead',
+  lead = 'lead'
 }
 
 @Entity()
 export default class Position extends Base {
-  @Column('enum', { enum: PositionLevel })
-  level: PositionLevel = PositionLevel.member
+  @Column('enum', { enum: PositionLevel, default: PositionLevel.member })
+  level: PositionLevel
 
   @ManyToOne(type => Team, team => team.positions)
   @JoinColumn()

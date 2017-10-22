@@ -9,16 +9,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   }
 
   teamId = parseInt(teamId, 10)
-  const team = await TeamService.getRepo().findOne({
-    join: {
-      alias: "team",
-      leftJoinAndSelect: {
-        positions: "team.positions",
-        user: "positions.user"
-      }
-    },
-    where: { id: teamId }
-  })
+  const team = await TeamService.findOneById(teamId, { includeAll: true })
 
   if (team) {
     req.context.team = team
