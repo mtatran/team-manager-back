@@ -22,17 +22,32 @@ If you have yarn, just run:  ```yarn```
 
 If you don't you can run ```npm install -g yarn``` to get it. Sudo might be required on mac/linux
 
-### 2. Setup database credentials
+### 2. Setup Environment
+
+Copy **.env.example** and rename it **.env**
+
+Put in something random for **API_SECRET** and then set API\_URL to be http://localhost.com
+(This will be the url the server thinks its hosting from and is just for testing purposes)
+
+Now OAuth authentications will redirect back to http://localhost.com but you don't own that domain.
+
+So in your hosts file, add an entry that redirects http://localhost.com to 127.0.0.1 (localhost)
+
+[Doing it on Linux](http://www.makeuseof.com/tag/modify-manage-hosts-file-linux/)
+
+[Doing it on Windows](https://support.rackspace.com/how-to/modify-your-hosts-file/)
+
+
+### 3. Setup database credentials
 
 Make sure you have access to a MySQL server. Ask tyler zhang (@tyler on slack) for credentials
 
 Or setup your own! [How To setup MySQL server](https://dev.mysql.com/doc/mysql-getting-started/en/)
 
-Copy **ormconfig.temp.json**, and rename it **ormconfig.json**
+Edit the .env file and input your credentials. This file is gitignored so it shouldn't end up in the repo
 
-Edit the file to fill in your credentials. This file is gitignored so it shouldn't end up in the repo
 
-### 3. You're ready to go!
+### 4. You're ready to go!
 
 Simply run ```yarn dev``` and the project should be up and running.
 

@@ -1,7 +1,7 @@
 import Position from '../models/Position'
-import service from './Service'
+import BaseModelService from './BaseModelService'
 
-class PositionService extends service<Position> {
+class PositionService extends BaseModelService<Position> {
   constructor () {
     super(Position)
   }

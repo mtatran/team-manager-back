@@ -2,11 +2,11 @@ import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
 
 import User from '../models/User'
-import Service from './Service'
-import { user as userConfig, auth as authConfig } from '../../config'
+import BaseModelService from './BaseModelService'
+import { user as userConfig } from '../../config'
 import { JwtToken } from '../../types'
 
-class UserService extends Service<User> {
+class UserService extends BaseModelService<User> {
   constructor () {
     super(User)
   }
@@ -46,7 +46,7 @@ class UserService extends Service<User> {
     /**
      * @todo: decide on how long these tokens should last
      */
-    return sign(jwtFields, authConfig.secret)
+    return sign(jwtFields, process.env.API_SECRET as string)
   }
 }
 

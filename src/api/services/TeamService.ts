@@ -1,7 +1,7 @@
 import Team from '../models/Team'
-import service from './Service'
+import BaseModelService from './BaseModelService'
 
-class TeamService extends service<Team> {
+class TeamService extends BaseModelService<Team> {
   constructor () {
     super(Team)
   }

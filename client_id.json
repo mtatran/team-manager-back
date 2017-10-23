@@ -1,0 +1,10 @@
+{
+  "__comment": "The client secret is removed from this object so that it's not included in the repo",
+  "client_id": "943913171833-no91vjd6embk8ne274pl6qpc8423n8qd.apps.googleusercontent.com",
+  "project_id": "waterloop-183714",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "redirect_uris": ["http://localhost:9000/oauth2callback"],
+  "javascript_origins": ["http://localhost:9000"]
+}
