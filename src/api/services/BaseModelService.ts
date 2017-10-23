@@ -5,7 +5,7 @@ interface queryOptions {
   includeAll: boolean
 }
 
-export default class Service<T> {
+export default class BaseModelService<T> {
   private repo: Repository<T>
   joinAllDefinition = {}
 

@@ -1,6 +1,5 @@
 import { Strategy, ExtractJwt } from 'passport-jwt'
 import UserService from '../services/UserService'
-import { auth as authConfig } from '../../config'
 
 const options = {
   jwtFromRequest: ExtractJwt.fromExtractors([
@@ -8,7 +7,7 @@ const options = {
     ExtractJwt.fromBodyField('Authorization'),
     ExtractJwt.fromUrlQueryParameter('Authorization')
   ]),
-  secretOrKey: authConfig.secret
+  secretOrKey: process.env.API_SECRET as string
 }
 
 export default new Strategy(options, async (jwt, done) => {
