@@ -26,7 +26,7 @@ class GoogleService {
     
     this.refreshToken = persist.getItemSync('refreshToken')
     if ( this.refreshToken ) {
-      this.onAuthSuccess(this.refreshToken)
+      this.getAccessTokenFromCode(this.refreshToken)
     }
   }
 
@@ -77,19 +77,13 @@ class GoogleService {
    * When authentication is successful and a code is obtained
    */
   async onAuthSuccess (authToken: string): Promise<any> {
-    try {
-      let tokenInfo: TokenResponse = await this.getAccessTokenFromCode(authToken)
-      
-      this.refreshToken = tokenInfo.refresh_token
-      this.accessToken = tokenInfo.access_token
-      this.expireTime = Date.now() + tokenInfo.expires_in
-      this.isAuthenticated = true
-      this.saveInfo()
-      
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
+    let tokenInfo: TokenResponse = await this.getAccessTokenFromCode(authToken)
+    
+    this.refreshToken = tokenInfo.refresh_token
+    this.accessToken = tokenInfo.access_token
+    this.expireTime = Date.now() + tokenInfo.expires_in
+    this.isAuthenticated = true
+    this.saveInfo()
   }
 
   /**
@@ -104,8 +98,11 @@ class GoogleService {
    * Try to use the refresh token to get a new access token 
    * (since the access token expires after around an hour)
    */
-  private reauthenticate () {
-    return this.onAuthSuccess(this.refreshToken)
+  private async reauthenticate () {
+    const authInfo = await this.getAccessTokenFromCode(this.refreshToken)
+    
+    this.accessToken = authInfo.access_token
+    this.expireTime = Date.now() + authInfo.expires_in
   }
 
   /**
