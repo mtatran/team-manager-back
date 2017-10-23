@@ -6,5 +6,4 @@ const router = Router()
 router.get('/google', OAuthController.redirectToGoogle)
 router.get('/google/callback', OAuthController.googleCallBack)
 
-
 export default router
