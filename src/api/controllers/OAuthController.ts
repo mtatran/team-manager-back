@@ -7,14 +7,16 @@ export default class OAuthController {
     res.redirect(authUrl)
   }
 
-  static googleCallBack (req: Request, res: Response) {
+  static async googleCallBack (req: Request, res: Response) {
     const {error, code} = req.query
 
     if( error ) {
       return res.send('Login failed')
     }
 
-    GoogleService.onAuthSuccess(code)
+    await GoogleService.onAuthSuccess(code)
+
+    const response = await GoogleService.getListOfFiles()
     return res.send('login success')
   }
 }
