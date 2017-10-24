@@ -2,7 +2,7 @@ import Team from '../models/Team'
 
 /**
  * @apiDefine success_team_full
- * 
+ *
  * @apiSuccess {Integer} id
  * @apiSuccess {String} name
  */
