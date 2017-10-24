@@ -4,7 +4,7 @@ import TeamService from '../services/TeamService'
 export default async (req: Request, res: Response, next: NextFunction) => {
   let teamId = req.params.teamId || req.body.teamId
 
-  if(isNaN(teamId)) {
+  if (isNaN(teamId)) {
     return res.status(400).json({message: 'TeamId must be a number'})
   }
 

@@ -4,8 +4,6 @@ import Base from './Base'
 import Position from './Position'
 import { Authority } from '../../types'
 
-
-
 @Entity()
 export default class User extends Base {
   @IsAlpha({message: 'You can only have letters in your name'})
@@ -39,10 +37,10 @@ export default class User extends Base {
 
   @Column({ default: false })
   slackAccess: boolean
-  
+
   @Column({ unique: true, length: 50, default: null, nullable: true })
   slackTag: string
-  
+
   @Column({ default: false })
   driveAccess: boolean
 

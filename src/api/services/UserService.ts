@@ -7,16 +7,16 @@ import { user as userConfig } from '../../config'
 import { JwtToken } from '../../types'
 
 class UserService extends BaseModelService<User> {
-  constructor () {
-    super(User)
+  joinAllDefinition = {
+    alias: 'user',
+    leftJoinAndSelect: {
+      positions: 'user.positions',
+      team: 'positions.team'
+    }
   }
 
-  joinAllDefinition = {
-    alias: "user",
-    leftJoinAndSelect: {
-      positions: "user.positions",
-      team: "positions.team"
-    } 
+  constructor () {
+    super(User)
   }
 
   async save (user: User) {
