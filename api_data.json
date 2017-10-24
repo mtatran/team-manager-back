@@ -1,5 +1,85 @@
 [
   {
+    "type": "POST",
+    "url": "/teams/:teamId/add",
+    "title": "Add user",
+    "name": "addUserToTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "teamId",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "userId",
+            "description": ""
+          }
+        ]
+      }
+    },
+    "filename": "src/api/teams.ts",
+    "groupTitle": "Teams"
+  },
+  {
+    "type": "POST",
+    "url": "/teams/create",
+    "title": "Create Team",
+    "name": "createTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "filename": "src/api/teams.ts",
+    "groupTitle": "Teams",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n   name: \"frontend\"\n}",
+          "type": "JSON"
+        }
+      ]
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": ""
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "get",
     "url": "/users/profile",
     "title": "Get Self Profile",
