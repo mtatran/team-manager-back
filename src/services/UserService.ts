@@ -3,8 +3,8 @@ import { sign } from 'jsonwebtoken'
 
 import User from '../models/User'
 import BaseModelService from './BaseModelService'
-import { user as userConfig } from '../../config'
-import { JwtToken } from '../../types'
+import { user as userConfig } from '../config'
+import { JwtToken } from '../types'
 
 class UserService extends BaseModelService<User> {
   joinAllDefinition = {

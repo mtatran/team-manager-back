@@ -2,7 +2,7 @@ import * as express from 'express'
 import { Request, Response, NextFunction } from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
-import initializeAuthentication from './api/authentication'
+import initializeAuthentication from './authentication'
 import api from './api'
 
 const app: express.Express = express()

@@ -33,8 +33,10 @@
   },
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
+    "@types/boom": "^4.3.7",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
+    "boom": "^6.0.0",
     "bunyan": "^1.8.12",
     "class-validator": "^0.7.3",
     "cookie-parser": "^1.4.3",
