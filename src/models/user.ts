@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne } from 'typeorm'
+import { Entity, Column, OneToOne, JoinColumn, ObjectID } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './base'
 import Team from './team'
@@ -8,8 +8,10 @@ export class UserPosition extends Base {
   @Column({ enum: PositionLevel })
   level: PositionLevel
 
-  @OneToOne(type => Team, { eager: true })
-  team: Team
+  @Column()
+  teamId: ObjectID
+
+  team?: Team
 }
 
 @Entity()
@@ -52,9 +54,12 @@ export default class User extends Base {
   @Column({ default: false })
   driveAccess: boolean
 
+  @Column()
+  driveRefreshToken: string
+
   @Column({ default: false })
   facebookAccess: boolean
 
   @Column(type => UserPosition)
-  positions: UserPosition
+  positions: UserPosition[] = []
 }

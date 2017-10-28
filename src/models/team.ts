@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinTable, ObjectID, ObjectIdColumn } from 'typeorm'
+import { Entity, Column, OneToOne, JoinColumn, ObjectID } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
 import { PositionLevel } from '../types'
 import Base from './base'
@@ -8,8 +8,10 @@ export class TeamPosition extends Base {
   @Column({ enum: PositionLevel })
   level: PositionLevel
 
-  @OneToOne(type => User, { eager: true })
-  user: User
+  @Column()
+  userId: ObjectID
+
+  user?: User
 }
 
 @Entity()
@@ -19,5 +21,5 @@ export default class Team extends Base {
   name: string
 
   @Column(type => TeamPosition)
-  positions: TeamPosition[]
+  positions: TeamPosition[] = []
 }

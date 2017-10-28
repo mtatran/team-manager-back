@@ -17,6 +17,12 @@
   version "4.3.7"
   resolved "https://registry.yarnpkg.com/@types/boom/-/boom-4.3.7.tgz#2771d7b1fd7df70c6860ed30ec6752feaca9f3de"
 
+"@types/bson@*":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@types/bson/-/bson-1.0.4.tgz#94260b6b96fa459346959c9216799d8919e95d2b"
+  dependencies:
+    "@types/node" "*"
+
 "@types/bunyan@^1.8.3":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.3.tgz#e4ec4b4e11ed9c80fb8c1addc05bb37aa3d2fbad"
@@ -57,6 +63,13 @@
 "@types/mime@*":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
+
+"@types/mongodb@^2.2.15":
+  version "2.2.15"
+  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-2.2.15.tgz#42577d8a92b9840dad440acf92fea6435c1fcfb3"
+  dependencies:
+    "@types/bson" "*"
+    "@types/node" "*"
 
 "@types/node-fetch@^1.6.7":
   version "1.6.7"
@@ -335,10 +348,6 @@ bcrypt-pbkdf@^1.0.0:
 bcryptjs@^2.4.3:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/bcryptjs/-/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
-
-bignumber.js@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-4.0.4.tgz#7c40f5abcd2d6623ab7b99682ee7db81b11889a4"
 
 binary-extensions@^1.0.0:
   version "1.10.0"
@@ -1908,15 +1917,6 @@ mv@~2:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
-mysql@^2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/mysql/-/mysql-2.15.0.tgz#ea16841156343e8f2e47fc8985ec41cdd9573b5c"
-  dependencies:
-    bignumber.js "4.0.4"
-    readable-stream "2.3.3"
-    safe-buffer "5.1.1"
-    sqlstring "2.3.0"
-
 mz@^2.4.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/mz/-/mz-2.7.0.tgz#95008057a56cafadc2bc63dde7f9ff6955948e32"
@@ -2393,7 +2393,7 @@ readable-stream@2.2.7:
     string_decoder "~1.0.0"
     util-deprecate "~1.0.1"
 
-readable-stream@2.3.3, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4:
+readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.3.tgz#368f2512d79f9d46fdfc71349ae7878bbc1eb95c"
   dependencies:
@@ -2693,10 +2693,6 @@ split@0.3:
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
-
-sqlstring@2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/sqlstring/-/sqlstring-2.3.0.tgz#525b8a4fd26d6f71aa61e822a6caf976d31ad2a8"
 
 sshpk@^1.7.0:
   version "1.13.1"

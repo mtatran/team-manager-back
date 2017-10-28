@@ -31,7 +31,6 @@ router.post('/create', [], TeamController.create)
  * @apiParam  {Integer} teamId
  *
  * @apiUse param_team_add_user
- *
  */
 router.post('/:teamId/add', [isValidTeam, isValidUser], TeamController.addUser)
 
