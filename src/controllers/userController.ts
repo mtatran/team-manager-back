@@ -1,6 +1,5 @@
 
 import { Request, Response, NextFunction } from 'express'
-import { hash } from 'bcryptjs'
 import UserService from '../services/userService'
 import * as UserPresentation from '../presentations/userPresentation'
 import User from '../models/user'

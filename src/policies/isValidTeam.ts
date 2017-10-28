@@ -4,11 +4,6 @@ import TeamService from '../services/teamService'
 export default async (req: Request, res: Response, next: NextFunction) => {
   let teamId = req.params.teamId || req.body.teamId
 
-  if (isNaN(teamId)) {
-    return res.status(400).json({message: 'TeamId must be a number'})
-  }
-
-  teamId = parseInt(teamId, 10)
   const team = await TeamService.findOneById(teamId, { includeAll: true })
 
   if (team) {

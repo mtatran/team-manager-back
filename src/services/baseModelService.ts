@@ -1,3 +1,4 @@
+import { ObjectID } from 'mongodb'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
 
@@ -6,7 +7,6 @@ interface QueryOptions {
 }
 
 export default class BaseModelService<T> {
-  joinAllDefinition = {}
   private repo: Repository<T>
 
   constructor (model: any) {
@@ -23,8 +23,16 @@ export default class BaseModelService<T> {
     await this.repo.save(obj)
   }
 
-  findOneById (id: Number, opts?: QueryOptions ) {
-    return this.repo.findOneById(id, this.parseOpts(opts))
+  findOneById (id: ObjectID | string, opts?: QueryOptions ) {
+    let documentID
+
+    if (id instanceof ObjectID) {
+      documentID = id
+    } else {
+      documentID = new ObjectID(id as string)
+    }
+
+    return this.repo.findOneById(documentID, this.parseOpts(opts))
   }
 
   findMany (query: FindManyOptions<T>, opts?: QueryOptions) {
@@ -47,10 +55,6 @@ export default class BaseModelService<T> {
     if (!opts) return undefined
 
     let options: any = {}
-    if (opts.includeAll) {
-      options.join = this.joinAllDefinition
-    }
-
     return options
   }
 

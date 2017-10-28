@@ -34,6 +34,7 @@
   "homepage": "https://github.com/teamwaterloop/team-manager-back#readme",
   "dependencies": {
     "@types/boom": "^4.3.7",
+    "@types/mongodb": "^2.2.15",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "boom": "^6.0.0",

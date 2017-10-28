@@ -2,9 +2,11 @@ import * as express from 'express'
 import { Request, Response, NextFunction } from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
+import * as Boom from 'boom'
+
 import initializeAuthentication from './authentication'
 import api from './api'
-import * as Boom from 'boom'
+import log from './utils/log'
 
 const app: express.Express = express()
 
@@ -24,9 +26,9 @@ app.use('/api', api)
  * Route for catching boom errors
  */
 app.use((err: Boom.BoomError, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.output.statusCode).json(err.message)
+  log.error(err)
+
+  res.json({ error: err.message })
 })
-
-
 
 export default app

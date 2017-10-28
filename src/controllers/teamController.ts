@@ -1,6 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express'
 import TeamService from '../services/teamService'
+import UserService from '../services/userService'
 import Team, { TeamPosition } from '../models/team'
 import User, { UserPosition } from '../models/user'
 
@@ -15,7 +16,7 @@ export default class UserController {
         name: "frontend"
      }
    */
-  public static create = async (req: Request, res: Response, next: NextFunction) => {
+  public static async create (req: Request, res: Response, next: NextFunction) {
     const team = new Team()
     team.name = req.body.name
 
@@ -37,17 +38,18 @@ export default class UserController {
         userId: 112
      }
    */
-  public static addUser = async (req: Request, res: Response, next: NextFunction) => {
+  public static async addUser (req: Request, res: Response, next: NextFunction) {
     const team: Team = req.context.team
     const user: User = req.context.user
 
     try {
       const positions = team.positions
       let userInTeam = positions.findIndex(position => position.user.id === user.id) >= 0
-
       if (userInTeam) {
         return res.status(400).json({message: 'userAlreadyInTeam'})
       }
+
+      await UserService.addTeamToUser(team, user)
 
       res.json({message: 'done'})
     } catch (e) {
@@ -55,7 +57,7 @@ export default class UserController {
     }
   }
 
-  public static getTeam = async (req: Request, res: Response, next: NextFunction) => {
+  public static async getTeam (req: Request, res: Response, next: NextFunction) {
     const team: Team = req.context.team
 
     const positions = team.positions

@@ -2,7 +2,6 @@ import 'reflect-metadata'
 import { config } from 'dotenv'
 import { createConnection, ConnectionOptions } from 'typeorm'
 import * as path from 'path'
-import { http } from './config'
 import log from './utils/log'
 
 config()  // Import .env file
@@ -21,7 +20,7 @@ const connectionSettings: ConnectionOptions = {
 createConnection(connectionSettings).then(() => {
   // Start the server
   const app = require('./app').default
-  const port: Number = Number(process.env.PORT) || http.port
+  const port: Number = Number(process.env.PORT)
   app.listen(port, () => log.info(`Server started and listening on port ${port}`))
 })
 .catch((err) => log.error(err))
