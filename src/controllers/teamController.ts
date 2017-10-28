@@ -44,11 +44,6 @@ export default class UserController {
 
     try {
       const positions = team.positions
-      let userInTeam = positions.findIndex(position => position.user.id === user.id) >= 0
-      if (userInTeam) {
-        return res.status(400).json({message: 'userAlreadyInTeam'})
-      }
-
       await UserService.addTeamToUser(team, user)
 
       res.json({message: 'done'})
