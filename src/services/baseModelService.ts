@@ -1,12 +1,15 @@
 import { ObjectID } from 'mongodb'
+import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
+import Populater, { PopulatePair, PopulateOptions, ResolveObjects } from '../utils/populater'
+import Base from '../models/base'
 
 interface QueryOptions {
   includeAll: boolean
 }
 
-export default class BaseModelService<T> {
+export default class BaseModelService<T extends Base> {
   private repo: Repository<T>
 
   constructor (model: any) {
@@ -59,4 +62,23 @@ export default class BaseModelService<T> {
   }
 
   getRepo = () => this.repo
+
+  async populate (docs: Object | Object[], paths: PopulatePair[], options: Partial<PopulateOptions> = {}) {
+    const populater = new Populater(docs, paths, options)
+    const neededIds = _.uniqBy(populater.neededIds, (id: ObjectID) => id.toHexString())
+
+    const results: T[] = await this.findMany({
+      where: { _id: { $in: neededIds } }
+    })
+
+    /**
+     * @todo: Maybe optimize this by using a hashmap
+     */
+    const resolveObjectArray: ResolveObjects[] = results.map(res => ({
+      id: res.id,
+      payload: res
+    }))
+
+    populater.resolve(resolveObjectArray, (a: ObjectID, b: ObjectID) => a.equals(b))
+  }
 }
