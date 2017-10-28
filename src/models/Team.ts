@@ -1,7 +1,16 @@
-import { Entity, Column, OneToMany, JoinTable } from 'typeorm'
+import { Entity, Column, OneToOne, JoinTable, ObjectID, ObjectIdColumn } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
+import { PositionLevel } from '../types'
 import Base from './Base'
-import Position from './Position'
+import User from './User'
+
+export class TeamPosition extends Base {
+  @Column({ enum: PositionLevel })
+  level: PositionLevel
+
+  @OneToOne(type => User, { eager: true })
+  user: User
+}
 
 @Entity()
 export default class Team extends Base {
@@ -9,7 +18,6 @@ export default class Team extends Base {
   @Column({ unique: true, length: 20})
   name: string
 
-  @OneToMany(type => Position, (position: Position) => position.team)
-  @JoinTable()
-  positions: Position[]
+  @Column(type => TeamPosition)
+  positions: TeamPosition[]
 }

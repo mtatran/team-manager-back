@@ -1,8 +1,16 @@
-import { Entity, Column, OneToMany } from 'typeorm'
+import { Entity, Column, OneToOne } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './Base'
-import Position from './Position'
-import { Authority } from '../../types'
+import Team from './Team'
+import { Authority, PositionLevel } from '../types'
+
+export class UserPosition extends Base {
+  @Column({ enum: PositionLevel })
+  level: PositionLevel
+
+  @OneToOne(type => Team, { eager: true })
+  team: Team
+}
 
 @Entity()
 export default class User extends Base {
@@ -47,7 +55,6 @@ export default class User extends Base {
   @Column({ default: false })
   facebookAccess: boolean
 
-  @OneToMany(type => Position, (position: Position) => position.user)
-  positions: Promise<Position[]>
-
+  @Column(type => UserPosition)
+  positions: UserPosition
 }
