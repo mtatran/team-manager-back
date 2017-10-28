@@ -10,7 +10,7 @@ import JWTStrategy from './jwtStrategy'
 passport.use(LocalStrategy)
 passport.use(JWTStrategy)
 passport.serializeUser((user: User, done) => done(null, user.id))
-passport.deserializeUser(async (id: number, done) => {
+passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await UserService.findOneById(id)
     if (user) return done(null, user)
