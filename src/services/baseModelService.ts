@@ -13,6 +13,9 @@ export default class BaseModelService<T> {
     this.repo = getRepository(model)
   }
 
+  /**
+   * Saves the given document but validates it first
+   */
   async save (obj: T): Promise<Error | ValidationError | void> {
     const validationResult = await validate(obj)
     if (validationResult.length) throw validationResult

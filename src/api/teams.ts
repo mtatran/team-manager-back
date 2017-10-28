@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 // Controllers
-import TeamController from '../controllers/TeamController'
+import TeamController from '../controllers/teamController'
 
 // Policies
 import isValidTeam from '../policies/isValidTeam'

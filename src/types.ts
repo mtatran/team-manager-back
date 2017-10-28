@@ -1,3 +1,5 @@
+import { ObjectID } from 'typeorm'
+
 export enum Authority {
   member = 'member',
   admin = 'admin'
@@ -10,7 +12,7 @@ export enum PositionLevel {
 }
 
 export interface JwtToken {
-  id: number
+  id: ObjectID
   email: string
   authority: Authority
 }

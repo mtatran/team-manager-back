@@ -1,7 +1,7 @@
 import * as qs from 'qs'
 import * as persist from 'node-persist'
 import fetch, { RequestInit, Response } from 'node-fetch'
-const googleConfig = require('../../../client_id.json')
+const googleConfig = require('../../client_id.json')
 
 interface TokenResponse {
   access_token: string

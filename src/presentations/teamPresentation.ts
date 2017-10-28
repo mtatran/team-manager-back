@@ -1,4 +1,4 @@
-import Team from '../models/Team'
+import Team from '../models/team'
 
 /**
  * @apiDefine success_team_full

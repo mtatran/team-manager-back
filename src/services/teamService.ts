@@ -1,5 +1,5 @@
-import Team from '../models/Team'
-import BaseModelService from './BaseModelService'
+import Team from '../models/team'
+import BaseModelService from './baseModelService'
 
 class TeamService extends BaseModelService<Team> {
   joinAllDefinition = {

@@ -1,8 +1,8 @@
 import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
 
-import User from '../models/User'
-import BaseModelService from './BaseModelService'
+import User from '../models/user'
+import BaseModelService from './baseModelService'
 import { user as userConfig } from '../config'
 import { JwtToken } from '../types'
 
@@ -19,7 +19,7 @@ class UserService extends BaseModelService<User> {
     super(User)
   }
 
-  async save (user: User) {
+  async create (user: User) {
     /**
      * @todo: Add password strength checker here
      */

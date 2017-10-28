@@ -4,6 +4,7 @@ import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import initializeAuthentication from './authentication'
 import api from './api'
+import * as Boom from 'boom'
 
 const app: express.Express = express()
 
@@ -19,13 +20,13 @@ app.use((req, res, next) => {
 
 app.use('/api', api)
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  let statusCode: number = err.statusCode || 500
-
-  if (err.name === Error.name) {
-    return res.status(statusCode).json({message: err.message})
-  }
-  return res.status(statusCode).json(err)
+/**
+ * Route for catching boom errors
+ */
+app.use((err: Boom.BoomError, req: Request, res: Response, next: NextFunction) => {
+  res.status(err.output.statusCode).json(err.message)
 })
+
+
 
 export default app

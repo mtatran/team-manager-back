@@ -1,11 +1,11 @@
 import { Application } from 'express'
 import * as passport from 'passport'
-import User from '../models/User'
-import UserService from '../services/UserService'
+import User from '../models/user'
+import UserService from '../services/userService'
 
 // Strategies
-import LocalStrategy from './LocalStrategy'
-import JWTStrategy from './JwtStrategy'
+import LocalStrategy from './localStrategy'
+import JWTStrategy from './jwtStrategy'
 
 passport.use(LocalStrategy)
 passport.use(JWTStrategy)
