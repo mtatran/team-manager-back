@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import TeamService from '../services/TeamService'
+import TeamService from '../services/teamService'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   let teamId = req.params.teamId || req.body.teamId

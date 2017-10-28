@@ -1,5 +1,5 @@
 import { Strategy } from 'passport-local'
-import UserService from '../services/UserService'
+import UserService from '../services/userService'
 
 const options = {
   usernameField: 'email',

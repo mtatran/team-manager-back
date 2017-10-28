@@ -1,8 +1,8 @@
 import { Entity, Column, OneToOne, JoinTable, ObjectID, ObjectIdColumn } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
 import { PositionLevel } from '../types'
-import Base from './Base'
-import User from './User'
+import Base from './base'
+import User from './user'
 
 export class TeamPosition extends Base {
   @Column({ enum: PositionLevel })

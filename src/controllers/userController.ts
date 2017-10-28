@@ -1,8 +1,9 @@
 
 import { Request, Response, NextFunction } from 'express'
-import UserService from '../services/UserService'
-import * as UserPresentation from '../presentations/UserPresentation'
-import User from '../models/User'
+import { hash } from 'bcryptjs'
+import UserService from '../services/userService'
+import * as UserPresentation from '../presentations/userPresentation'
+import User from '../models/user'
 
 export default class UserController {
   /**
@@ -25,7 +26,7 @@ export default class UserController {
         password: "password"
      }
    */
-  public static signup = async (req: Request, res: Response, next: NextFunction) => {
+  public static async signup (req: Request, res: Response, next: NextFunction) {
     const user = new User()
     user.address = req.body.address
     user.email = req.body.email
@@ -35,7 +36,7 @@ export default class UserController {
     user.password = req.body.password
 
     try {
-      await UserService.save(user)
+      await UserService.create(user)
     } catch (e) {
       return next(e)
     }
@@ -55,15 +56,16 @@ export default class UserController {
       password: "password"
     }
    */
-  public static login = (req: Request, res: Response) => {
+  public static async login (req: Request, res: Response) {
     const user = req.user
     let jwt = UserService.createUserJwtToken(user)
 
     res.json({token: jwt})
   }
 
-  public static getProfile = (req: Request, res: Response) => {
+  public static async getProfile (req: Request, res: Response) {
     const presented = UserPresentation.fullUser(req.user)
     res.json(presented)
   }
+
 }

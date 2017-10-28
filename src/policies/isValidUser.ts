@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import UserService from '../services/UserService'
+import UserService from '../services/userService'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   let userId = req.params.userId || req.body.userId

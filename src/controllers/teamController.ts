@@ -1,8 +1,8 @@
 
 import { Request, Response, NextFunction } from 'express'
-import TeamService from '../services/TeamService'
-import Team, { TeamPosition } from '../models/Team'
-import User, { UserPosition } from '../models/User'
+import TeamService from '../services/teamService'
+import Team, { TeamPosition } from '../models/team'
+import User, { UserPosition } from '../models/user'
 
 export default class UserController {
   /**
@@ -49,11 +49,6 @@ export default class UserController {
         return res.status(400).json({message: 'userAlreadyInTeam'})
       }
 
-      const pos = new Position()
-      pos.team = team
-      pos.user = user
-
-      await PositionService.save(pos)
       res.json({message: 'done'})
     } catch (e) {
       return next(e)

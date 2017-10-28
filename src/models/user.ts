@@ -1,7 +1,7 @@
 import { Entity, Column, OneToOne } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
-import Base from './Base'
-import Team from './Team'
+import Base from './base'
+import Team from './team'
 import { Authority, PositionLevel } from '../types'
 
 export class UserPosition extends Base {

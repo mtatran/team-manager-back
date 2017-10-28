@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import GoogleService from '../services/GoogleService'
+import GoogleService from '../services/googleService'
 
 export default class OAuthController {
   static redirectToGoogle (req: Request, res: Response) {

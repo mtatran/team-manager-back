@@ -2,7 +2,7 @@ import { Router } from 'express'
 import * as passport from 'passport'
 
 // Controllers
-import UserController from '../controllers/UserController'
+import UserController from '../controllers/userController'
 
 // Policies
 import isAuthenticated from '../policies/isAuthenticated'
