@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import OAuthController from './controllers/OAuthController'
+import OAuthController from '../controllers/OAuthController'
 
 const router = Router()
 

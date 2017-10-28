@@ -2,10 +2,10 @@ import { Router } from 'express'
 import * as passport from 'passport'
 
 // Controllers
-import UserController from './controllers/UserController'
+import UserController from '../controllers/UserController'
 
 // Policies
-import isAuthenticated from './policies/isAuthenticated'
+import isAuthenticated from '../policies/isAuthenticated'
 
 const router = Router()
 

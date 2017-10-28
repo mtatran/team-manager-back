@@ -1,10 +1,8 @@
 
 import { Request, Response, NextFunction } from 'express'
 import TeamService from '../services/TeamService'
-import PositionService from '../services/PositionService'
-import Team from '../models/Team'
-import User from '../models/User'
-import Position from '../models/Position'
+import Team, { TeamPosition } from '../models/Team'
+import User, { UserPosition } from '../models/User'
 
 export default class UserController {
   /**

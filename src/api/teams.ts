@@ -1,11 +1,11 @@
 import { Router } from 'express'
 
 // Controllers
-import TeamController from './controllers/TeamController'
+import TeamController from '../controllers/TeamController'
 
 // Policies
-import isValidTeam from './policies/isValidTeam'
-import isValidUser from './policies/isValidUser'
+import isValidTeam from '../policies/isValidTeam'
+import isValidUser from '../policies/isValidUser'
 
 const router = Router()
 
