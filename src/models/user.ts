@@ -2,7 +2,7 @@ import { Entity, Column, OneToOne, JoinColumn, ObjectID } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './base'
 import Team from './team'
-import { Authority, PositionLevel } from '../types'
+import { Authority, PositionLevel, OAuthBearer } from '../types'
 
 export class UserPosition extends Base {
   @Column({ enum: PositionLevel })
@@ -12,6 +12,17 @@ export class UserPosition extends Base {
   teamId: ObjectID
 
   team?: Team
+}
+
+export class GoogleAuthentcation implements OAuthBearer {
+  @Column()
+  refreshToken: string
+
+  @Column()
+  token: string
+
+  @Column()
+  tokenExpireDate: Date
 }
 
 @Entity()
@@ -51,11 +62,11 @@ export default class User extends Base {
   @Column({ unique: true, length: 50, default: null, nullable: true })
   slackTag: string
 
+  @Column(type => GoogleAuthentcation)
+  googleAuth?: GoogleAuthentcation
+
   @Column({ default: false })
   driveAccess: boolean
-
-  @Column()
-  driveRefreshToken: string
 
   @Column({ default: false })
   facebookAccess: boolean

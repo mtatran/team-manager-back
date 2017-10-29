@@ -45,6 +45,7 @@ export default class UserController {
     try {
       const positions = team.positions
       await UserService.addTeamToUser(team, user)
+      await TeamService.addUserToTeam(user, team)
 
       res.json({message: 'done'})
     } catch (e) {

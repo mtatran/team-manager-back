@@ -16,3 +16,9 @@ export interface JwtToken {
   email: string
   authority: Authority
 }
+
+export interface OAuthBearer {
+  refreshToken: string
+  token: string
+  tokenExpireDate: Date
+}

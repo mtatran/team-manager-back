@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import Users from './users'
 import Teams from './teams'
-import Auth from './auth'
+import Google from './google'
 
 const router = Router()
 
 router.use('/users', Users)
 router.use('/teams', Teams)
-router.use('/auth', Auth)
+router.use('/google', Google)
 
 export default router

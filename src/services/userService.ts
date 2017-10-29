@@ -54,7 +54,7 @@ class UserService extends BaseModelService<User> {
   }
 
   /**
-   * Add a position record to the team document referencing the team and position
+   * Add a position record to the user document referencing the team and position
    */
   async addTeamToUser (team: Team, user: User, level: PositionLevel = PositionLevel.member) {
     // Check if user is already part of the team
