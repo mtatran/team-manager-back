@@ -3,7 +3,7 @@ import UserService from '../services/userService'
 import TeamService from '../services/teamService'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  let userId = req.params.userId || req.body.userId
+  let userId = req.params.userId || req.body.userId || req.query.userId
 
   const user = await UserService.findOneById(userId, { includeAll: true })
 

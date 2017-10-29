@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb'
+import { ObjectID } from 'typeorm'
 import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
@@ -65,7 +65,7 @@ export default class BaseModelService<T extends Base> {
 
   async populate (docs: Object | Object[], paths: PopulatePair[], options: Partial<PopulateOptions> = {}) {
     const populater = new Populater(docs, paths, options)
-    const neededIds = _.uniqBy(populater.neededIds, (id: ObjectID) => id.toHexString())
+    const neededIds = _.uniqBy(populater.neededIds, (id: ObjectID) => id.toString())
 
     const results: T[] = await this.findMany({
       where: { _id: { $in: neededIds } }
