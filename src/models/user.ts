@@ -14,7 +14,7 @@ export class UserPosition extends Base {
   team?: Team
 }
 
-export class GoogleAuthentcation implements OAuthBearer {
+export class GoogleAuthentication implements OAuthBearer {
   @Column()
   refreshToken: string
 
@@ -62,8 +62,8 @@ export default class User extends Base {
   @Column({ unique: true, length: 50, default: null, nullable: true })
   slackTag: string
 
-  @Column(type => GoogleAuthentcation)
-  googleAuth?: GoogleAuthentcation
+  @Column(type => GoogleAuthentication)
+  googleAuth: GoogleAuthentication
 
   @Column({ default: false })
   driveAccess: boolean
