@@ -7,8 +7,8 @@ import UserService from '../services/userService'
 import LocalStrategy from './localStrategy'
 import JWTStrategy from './jwtStrategy'
 
-passport.use(LocalStrategy)
 passport.use(JWTStrategy)
+passport.use(LocalStrategy)
 passport.serializeUser((user: User, done) => done(null, user.id.toString()))
 passport.deserializeUser(async (id: string, done) => {
   try {
@@ -23,5 +23,5 @@ passport.deserializeUser(async (id: string, done) => {
 
 export default (app: Application) => {
   app.use(passport.initialize())
-  app.use(passport.session())
+  app.use(passport.authenticate('jwt'))
 }

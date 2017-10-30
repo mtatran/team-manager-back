@@ -24,7 +24,7 @@ const router = Router()
        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e..."
    }
  */
-router.post('/login', passport.authenticate('local'), UserController.login)
+router.post('/login', passport.authenticate('local', { session: false}), UserController.login)
 
 /**
  * @api {POST} /users/signup Signup

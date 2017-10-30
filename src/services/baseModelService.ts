@@ -1,4 +1,4 @@
-import { ObjectID } from 'typeorm'
+import { ObjectID } from 'mongodb'
 import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
@@ -29,10 +29,10 @@ export default class BaseModelService<T extends Base> {
   findOneById (id: ObjectID | string, opts?: QueryOptions ) {
     let documentID
 
-    if (id instanceof ObjectID) {
-      documentID = id
-    } else {
+    if (typeof id === 'string') {
       documentID = new ObjectID(id as string)
+    } else {
+      documentID = id
     }
 
     return this.repo.findOneById(documentID, this.parseOpts(opts))
