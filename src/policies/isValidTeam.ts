@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import * as Boom from 'boom'
 import TeamService from '../services/teamService'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
@@ -6,10 +7,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const team = await TeamService.findOneById(teamId, { includeAll: true })
 
-  if (team) {
-    req.context.team = team
-    return next()
+  if (!team) {
+    next(Boom.badRequest('Team does not exist'))
   }
 
-  return res.status(400).json({message: 'notAValidTeam'})
+  req.context.team = team
+  return next()
 }
