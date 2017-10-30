@@ -1,9 +1,12 @@
-import { Strategy, ExtractJwt } from 'passport-jwt'
+import * as passportJWT from 'passport-jwt'
 import UserService from '../services/userService'
+
+const ExtractJwt = passportJWT.ExtractJwt
+const Strategy = passportJWT.Strategy
 
 const options = {
   jwtFromRequest: ExtractJwt.fromExtractors([
-    ExtractJwt.fromAuthHeaderWithScheme('jwt'),
+    ExtractJwt.fromAuthHeaderWithScheme('JWT'),
     ExtractJwt.fromBodyField('Authorization'),
     ExtractJwt.fromUrlQueryParameter('Authorization')
   ]),
@@ -12,8 +15,14 @@ const options = {
 
 export default new Strategy(options, async (jwt, done) => {
   try {
-    const user = UserService.findOneById(jwt.id)
-    return done(null, user)
+    const user = await UserService.findOneById(jwt.id)
+
+    if (user) {
+      return done(null, user)
+    } else {
+      return done(null, false)
+    }
+
   } catch (e) {
     done(e)
   }
