@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import * as Boom from 'boom'
 import UserService from '../services/userService'
 import TeamService from '../services/teamService'
 
@@ -13,5 +14,5 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     return next()
   }
 
-  return res.status(400).json({message: 'notAValidUser'})
+  return next(Boom.badRequest('User does not exist'))
 }

@@ -9,5 +9,5 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
 
   if (isAuthed) return next()
-  next(Boom.expectationFailed('User not authenticated to google'))
+  next(Boom.preconditionRequired('User must login to google'))
 }
