@@ -1,3 +1,10 @@
+/**
+ * This file is for implementing a service to interact with google drive's api
+ *
+ * Resources for additional information:
+ * https://developers.google.com/drive/v2/reference/files#resource
+ */
+
 import * as qs from 'qs'
 import fetch, { RequestInit, Response } from 'node-fetch'
 import User from '../models/user'
@@ -15,14 +22,32 @@ export interface DriveListOptions {
   corpora?: 'default' | 'domain' | 'teamDrive' | 'allTeamDrives'
   maxResults?: number
   orderBy?: 'createdDate' | 'folder' | 'lastViewedByMeDate' | 'modifiedByMeDate' | 'modifiedDate'
-  pageToken: string
+  pageToken?: string
   | 'quotaBytesUsed' | 'recency' | 'sharedWithMeDate' | 'starred' | 'title'
   q?: string
 }
 
+/**
+ * This is a partial definition, only including fields that matter
+ */
+export interface DriveFileCapabilities {
+  canShare: boolean
+}
+
+/**
+ * This is a partial definition and does not include everything
+ * that google drive returns. It only includes the important stuff
+ */
+export interface DriveFile {
+  id: string
+  title: string
+  description: string
+  capabilities: DriveFileCapabilities
+}
+
 export interface DriveListResponse {
   nextPageToken?: string
-
+  items: DriveFile[]
 }
 
 class GoogleService {
@@ -87,7 +112,7 @@ class GoogleService {
   /**
    * Return list of files
    */
-  static async getListOfFiles (auth: OAuthBearer, options: DriveListOptions) {
+  static async getListOfFiles (auth: OAuthBearer, options: DriveListOptions = {}): Promise<DriveListResponse> {
     const queryString = qs.stringify(options)
 
     const result = await this.authFetch(`${this.FILE_LIST_URL}?${queryString}`, auth.token)
