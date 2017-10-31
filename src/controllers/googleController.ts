@@ -3,33 +3,36 @@ import * as Boom from 'boom'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import UserService from '../services/userService'
-import User from '../models/user'
-import { OAuthBearer } from '../types'
+import User, { GoogleAuthentication } from '../models/user'
+import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
 
-export default class OAuthController {
+interface AuthedUser extends User {
+  googleAuth: GoogleAuthentication
+}
+
+class GoogleController {
   /**
    * Redirects the user to the appropriate link for authorization
    */
-  static redirectToGoogle (req: Request, res: Response) {
+  redirectToGoogle = (req: Request, res: Response) => {
     let authUrl = GoogleService.getAuthUrl()
 
     res.redirect(authUrl)
   }
 
-  static async googleCallBack (req: Request, res: Response, next: NextFunction) {
+  googleCallBack = async (req: Request, res: Response, next: NextFunction) => {
+    const user: User = req.user
     const {error, code} = req.query
 
     if ( error ) return next(Boom.boomify(error))
 
-    const userId = req.signedCookies.userId
-    if (!userId) {
-      return next(Boom.unauthorized('userId cookie was not found'))
+    const bearer = await GoogleService.onAuthSuccess(code)
+
+    if (user.googleAuth && user.googleAuth.refreshToken && !bearer.refreshToken) {
+      return next(Boom.conflict('Do not need to reauthenticate to google'))
     }
 
-    const bearer = await GoogleService.onAuthSuccess(code)
-    const user: User = req.user
-
-    user.googleAuth = bearer
+    user.googleAuth = bearer as OAuthBearerWithRefresh
     await UserService.save(user)
     /**
      * @todo should redirect page to a react page
@@ -37,7 +40,7 @@ export default class OAuthController {
     return res.send('login success')
   }
 
-  static isAuthenticated (req: Request, res: Response) {
+  isAuthenticated = (req: Request, res: Response) => {
     const user: User = req.user
     const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
 
@@ -51,13 +54,13 @@ export default class OAuthController {
    * @apiParam {string} [q] Search Query
    * @apiParam {Integer} [pageToken] Page token for requesting a certain page
    */
-  static async getFiles (req: Request, res: Response, next: NextFunction) {
-    const user: User = req.user
+  getFiles = async (req: Request, res: Response, next: NextFunction) => {
+    const user: AuthedUser = req.user
     try {
       await this.prepareUserAuthentication(user)
 
       const options: DriveListOptions = {
-        maxResults: req.query.pageSize || 50,
+        pageSize: req.query.pageSize || 50,
         q: req.query.q,
         pageToken: req.query.pageToken
       }
@@ -74,15 +77,15 @@ export default class OAuthController {
    * Will refresh tokens if needed and will throw an error if the user
    * has never authenticated to google before
    */
-  private static async prepareUserAuthentication (user: User): Promise<void> {
-    if (user.googleAuth === undefined) {
-      throw Boom.preconditionRequired('You must log into Google first', { type: 'Google'})
-    }
-
+  private async prepareUserAuthentication (user: AuthedUser): Promise<void> {
     if (GoogleService.isAuthenticated(user.googleAuth)) return
 
-    const newBearer = await GoogleService.reauthenticate(user.googleAuth)
-    user.googleAuth = newBearer
+    const newBearer: OAuthBearerWithRefresh = await GoogleService.reauthenticate(user.googleAuth)
+
+    user.googleAuth.token = newBearer.token
+    user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
     await UserService.save(user)
   }
 }
+
+export default new GoogleController()

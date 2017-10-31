@@ -6,8 +6,8 @@ import User from '../models/user'
 export default async (req: Request, res: Response, next: NextFunction) => {
   const user: User = req.user
 
-  const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
+  const isAuthed = user.googleAuth !== undefined
 
   if (isAuthed) return next()
-  next(Boom.preconditionRequired('User must login to google'))
+  next(Boom.preconditionRequired('You must log into Google first', { type: 'Google'}))
 }

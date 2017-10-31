@@ -12,8 +12,7 @@ export const listResponse = (response: DriveListResponse) => ({
   nextPageToken: response.nextPageToken,
   items: response.items.map(item => ({
     id: item.id,
-    title: item.title,
-    description: item.description,
+    title: item.name,
     canShare: item.capabilities.canShare
   }))
 })

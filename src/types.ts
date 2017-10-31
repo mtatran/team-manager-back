@@ -22,3 +22,7 @@ export interface OAuthBearer {
   token: string
   tokenExpireDate: Date
 }
+
+export interface OAuthBearerWithRefresh extends OAuthBearer {
+  refreshToken: string
+}
