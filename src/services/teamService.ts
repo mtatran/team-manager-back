@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb'
 import Team, { TeamPosition } from '../models/team'
 import User from '../models/user'
 import BaseModelService from './baseModelService'
@@ -31,7 +30,7 @@ class TeamService extends BaseModelService<Team> {
     position.level = level
 
     team.positions.push(position)
-    this.save(team)
+    return this.save(team)
   }
 }
 

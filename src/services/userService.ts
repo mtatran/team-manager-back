@@ -1,7 +1,5 @@
 import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
-import { ObjectId } from 'mongodb'
-import * as Boom from 'boom'
 
 import User, { UserPosition } from '../models/user'
 import Team from '../models/team'
@@ -71,7 +69,7 @@ class UserService extends BaseModelService<User> {
     position.level = level
 
     user.positions.push(position)
-    this.save(user)
+    return this.save(user)
   }
 }
 
