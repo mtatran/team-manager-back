@@ -4,15 +4,15 @@ import { DriveListResponse } from '../services/googleService'
  * @apiDefine success_google_list_response
  *
  * @apiSuccess {String} id
- * @apiSuccess {String} title
- * @apiSuccess {String} description
+ * @apiSuccess {String} name
  * @apiSuccess {Boolean} canShare If the user has the permission to share this folder
  */
 export const listResponse = (response: DriveListResponse) => ({
   nextPageToken: response.nextPageToken,
-  items: response.items.map(item => ({
-    id: item.id,
-    title: item.name,
-    canShare: item.capabilities.canShare
+  files: response.files.map(file => ({
+    id: file.id,
+    name: file.name,
+    canShare: file.capabilities.canShare,
+    mimeType: file.mimeType
   }))
 })
