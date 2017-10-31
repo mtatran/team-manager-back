@@ -1,5 +1,5 @@
 import { Entity, Column, ObjectID } from 'typeorm'
-import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
+import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
 import Base from './base'
 import Team from './team'
 import { Authority, PositionLevel, OAuthBearer } from '../types'
@@ -56,20 +56,25 @@ export default class User extends Base {
   @Column('enum', { enum: Authority, default: Authority.member })
   authority: Authority
 
+  @IsBoolean()
   @Column({ default: false })
-  slackAccess: boolean
+  slackAccess: boolean = false
 
+  @IsOptional()
+  @IsString()
   @Column({ unique: true, length: 50, default: null, nullable: true })
   slackTag: string
 
   @Column(type => GoogleAuthentication)
-  googleAuth: GoogleAuthentication
+  googleAuth?: GoogleAuthentication
 
+  @IsBoolean()
   @Column({ default: false })
-  driveAccess: boolean
+  driveAccess: boolean = false
 
+  @IsBoolean()
   @Column({ default: false })
-  facebookAccess: boolean
+  facebookAccess: boolean = false
 
   @Column(type => UserPosition)
   positions: UserPosition[] = []

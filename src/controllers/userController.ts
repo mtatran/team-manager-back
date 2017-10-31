@@ -59,12 +59,11 @@ export default class UserController {
     const user = req.user
     let jwt = UserService.createUserJwtToken(user)
 
-    res.json({token: jwt})
+    res.cookie('authorization', jwt, { httpOnly: true }).end()
   }
 
   public static async getProfile (req: Request, res: Response) {
     const presented = UserPresentation.fullUser(req.user)
     res.json(presented)
   }
-
 }

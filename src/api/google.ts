@@ -38,6 +38,9 @@ router.get('/callback', [isAuthenticated], GoogleController.googleCallBack)
  * @apiName googleGetFiles
  * @apiGroup google
  * @apiVersion  1.0.0
+ *
+ * @apiUse controller_google_get_files
+ * @apiUse success_google_list_response
  */
 router.get('/files', [isAuthenticated, isGoogleAuthenticated], GoogleController.getFiles)
 
