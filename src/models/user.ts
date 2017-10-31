@@ -2,7 +2,7 @@ import { Entity, Column, ObjectID } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
 import Base from './base'
 import Team from './team'
-import { Authority, PositionLevel, OAuthBearer } from '../types'
+import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
 
 export class UserPosition extends Base {
   @Column({ enum: PositionLevel })
@@ -14,7 +14,7 @@ export class UserPosition extends Base {
   team?: Team
 }
 
-export class GoogleAuthentication implements OAuthBearer {
+export class GoogleAuthentication implements OAuthBearerWithRefresh {
   @Column()
   refreshToken: string
 

@@ -19,7 +19,7 @@ export interface TokenResponse {
 
 export interface DriveListOptions {
   corpora?: 'default' | 'domain' | 'teamDrive' | 'allTeamDrives'
-  maxResults?: number
+  pageSize?: number
   orderBy?: 'createdDate' | 'folder' | 'lastViewedByMeDate' | 'modifiedByMeDate' | 'modifiedDate'
   pageToken?: string
   | 'quotaBytesUsed' | 'recency' | 'sharedWithMeDate' | 'starred' | 'title'
@@ -39,13 +39,13 @@ export interface DriveFileCapabilities {
  */
 export interface DriveFile {
   id: string
-  title: string
-  description: string
+  name: string
   capabilities: DriveFileCapabilities
 }
 
 export interface DriveListResponse {
   nextPageToken?: string
+  incompleteSearch: boolean
   items: DriveFile[]
 }
 
@@ -75,21 +75,21 @@ class GoogleService {
    * When authentication is successful and a code is obtained
    */
   static async onAuthSuccess (authToken: string): Promise<OAuthBearer> {
-    return this.getAccessTokenFromCode(authToken)
+    return this.getAccessTokenFromCode(authToken, false)
   }
 
   /**
    * Check to see if the server is currently authenticated
    */
   static isAuthenticated (auth: OAuthBearer): boolean {
-    return 'token' in auth && auth.tokenExpireDate.getTime() < Date.now()
+    return 'token' in auth && auth.tokenExpireDate.getTime() > Date.now()
   }
 
   /**
    * Use the OAuthBearer data and create a new one by reauthenticating
    */
   static async reauthenticate (auth: OAuthBearer): Promise<OAuthBearer> {
-    return this.getAccessTokenFromCode(auth.refreshToken)
+    return this.getAccessTokenFromCode(auth.refreshToken, true)
   }
 
   /**
@@ -112,7 +112,10 @@ class GoogleService {
    * Return list of files
    */
   static async getListOfFiles (auth: OAuthBearer, options: DriveListOptions = {}): Promise<DriveListResponse> {
-    const queryString = qs.stringify(options)
+    const queryString = qs.stringify({
+      fields: 'items(capabilities/canShare)',
+      ...options
+    })
 
     const result = await this.authFetch(`${this.FILE_LIST_URL}?${queryString}`, auth.token)
     const data = await result.json()
@@ -124,13 +127,14 @@ class GoogleService {
   /**
    * Given a code, try to get an access token
    */
-  private static async getAccessTokenFromCode (code: string): Promise<OAuthBearer> {
+  private static async getAccessTokenFromCode (code: string, refresh: boolean): Promise<OAuthBearer> {
     const body = {
-      code,
+      code: refresh ? undefined : code,
+      refresh_token: refresh ? code : undefined,
       client_id: googleConfig.client_id,
       client_secret: process.env.GOOGLE_SECRET,
       redirect_uri: this.CALLBACK_URL,
-      grant_type: 'authorization_code'
+      grant_type: refresh ? 'refresh_token' : 'authorization_code'
     }
 
     let result = await fetch(this.AUTH_TOKEN_URL, {
