@@ -40,13 +40,14 @@ export interface DriveFileCapabilities {
 export interface DriveFile {
   id: string
   name: string
+  mimeType: string
   capabilities: DriveFileCapabilities
 }
 
 export interface DriveListResponse {
   nextPageToken?: string
   incompleteSearch: boolean
-  items: DriveFile[]
+  files: DriveFile[]
 }
 
 class GoogleService {
@@ -112,12 +113,10 @@ class GoogleService {
    * Return list of files
    */
   static async getListOfFiles (auth: OAuthBearer, options: DriveListOptions = {}): Promise<DriveListResponse> {
-    const queryString = qs.stringify({
-      fields: 'items(capabilities/canShare)',
-      ...options
-    })
+    const queryString = qs.stringify(options)
+    const fields = 'nextPageToken,incompleteSearch,files(id,name,mimeType,capabilities/canShare)'
 
-    const result = await this.authFetch(`${this.FILE_LIST_URL}?${queryString}`, auth.token)
+    const result = await this.authFetch(`${this.FILE_LIST_URL}?fields=${fields}&${queryString}`, auth.token)
     const data = await result.json()
 
     if (!result.ok) throw data
