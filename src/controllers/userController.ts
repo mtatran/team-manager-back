@@ -6,7 +6,7 @@ import User from '../models/user'
 
 export default class UserController {
   /**
-   * @apiDefine param_user_signup
+   * @apiDefine controller_user_signup
    *
    * @apiParam {String} [address]
    * @apiParam {String} email
@@ -44,7 +44,7 @@ export default class UserController {
   }
 
   /**
-   * @apiDefine param_user_login
+   * @apiDefine controller_user_login
    *
    * @apiParam {String} email
    * @apiParam {String} password

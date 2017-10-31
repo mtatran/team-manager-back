@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn, ObjectID } from 'typeorm'
+import { Entity, Column, ObjectID } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional } from 'class-validator'
 import Base from './base'
 import Team from './team'

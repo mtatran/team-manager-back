@@ -13,7 +13,7 @@ const router = Router()
  * @apiGroup google
  * @apiVersion 1.0.0
  *
- * @apiSuccess {200} {boolean} authenticated
+ * @apiSuccess {boolean} authenticated
 */
 router.get('/isAuthenticated', [isAuthenticated], GoogleController.isAuthenticated)
 

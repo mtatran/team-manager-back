@@ -15,7 +15,7 @@ const router = Router()
  * @apiGroup Users
  * @apiVersion  1.0.0
  *
- * @apiUse param_user_login
+ * @apiUse controller_user_login
  *
  * @apiSuccess (200) {String} token JWT for authentication
  *
@@ -32,7 +32,7 @@ router.post('/login', passport.authenticate('local', { session: false}), UserCon
  * @apiGroup Users
  * @apiVersion  1.0.0
  *
- * @apiUse param_user_signup
+ * @apiUse controller_user_signup
  *
  * @apiSuccess (200) {String} message
  * @apiSuccessExample {JSON} Success-Response:

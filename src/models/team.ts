@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn, ObjectID } from 'typeorm'
+import { Entity, Column, ObjectID } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
 import { PositionLevel } from '../types'
 import Base from './base'
