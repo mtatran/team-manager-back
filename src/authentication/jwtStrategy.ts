@@ -1,11 +1,16 @@
-import * as passportJWT from 'passport-jwt'
+import { Request } from 'express'
+import { ExtractJwt, Strategy } from 'passport-jwt'
 import UserService from '../services/userService'
 
-const ExtractJwt = passportJWT.ExtractJwt
-const Strategy = passportJWT.Strategy
+const fromCookie = (field: string) => (request: Request) => {
+  let jwt = request.cookies[field]
+
+  return jwt || null
+}
 
 const options = {
   jwtFromRequest: ExtractJwt.fromExtractors([
+    fromCookie('authorization'),
     ExtractJwt.fromAuthHeaderWithScheme('JWT'),
     ExtractJwt.fromBodyField('Authorization'),
     ExtractJwt.fromUrlQueryParameter('Authorization')
