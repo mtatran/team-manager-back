@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
-import GoogleService from '../services/googleService'
 import User from '../models/user'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
