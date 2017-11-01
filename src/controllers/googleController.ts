@@ -80,7 +80,7 @@ class GoogleController {
   private async prepareUserAuthentication (user: AuthedUser): Promise<void> {
     if (GoogleService.isAuthenticated(user.googleAuth)) return
 
-    const newBearer: OAuthBearerWithRefresh = await GoogleService.reauthenticate(user.googleAuth)
+    const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)
 
     user.googleAuth.token = newBearer.token
     user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
