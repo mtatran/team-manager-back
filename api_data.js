@@ -517,14 +517,7 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "title",
-            "description": ""
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "description",
+            "field": "name",
             "description": ""
           },
           {
