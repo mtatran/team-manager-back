@@ -155,6 +155,80 @@
     "name": "ObjectUserposition"
   },
   {
+    "type": "DELETE",
+    "url": "/teams/:teamId/file/:fileId",
+    "title": "Add file to team",
+    "name": "addFileToTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "filename": "src/api/teams.ts",
+    "groupTitle": "Teams",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "teamId",
+            "description": "<p>Should be the valid mongodb team id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "fileId",
+            "description": "<p>Should be the file id from google drive</p>"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "POST",
+    "url": "/teams/:teamId/file/:fileId",
+    "title": "Add file to team",
+    "name": "addFileToTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "filename": "src/api/teams.ts",
+    "groupTitle": "Teams",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "teamId",
+            "description": "<p>Should be the valid mongodb team id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "fileId",
+            "description": "<p>Should be the file id from google drive</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "permission",
+            "description": "<p>Can be either 'read' or 'write'</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n  permission: \"read\"\n}",
+          "type": "JSON"
+        }
+      ]
+    }
+  },
+  {
     "type": "POST",
     "url": "/teams/:teamId/add",
     "title": "Add User",
