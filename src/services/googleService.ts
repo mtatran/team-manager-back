@@ -50,6 +50,11 @@ export interface DriveListResponse {
   files: DriveFile[]
 }
 
+export interface AddPermissionOptions {
+  emailMessage: string
+  sendNotificationEmails: boolean
+}
+
 class GoogleService {
   static USER_REDIRECT = 'https://accounts.google.com/o/oauth2/v2/auth'
   static AUTH_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
@@ -75,8 +80,8 @@ class GoogleService {
   /**
    * When authentication is successful and a code is obtained
    */
-  static async onAuthSuccess (authToken: string): Promise<OAuthBearer> {
-    return this.getAccessTokenFromCode(authToken, false)
+  static async onAuthSuccess (code: string): Promise<OAuthBearer> {
+    return this.getAccessTokenFromCode(code, false)
   }
 
   /**
@@ -109,6 +114,16 @@ class GoogleService {
     })
   }
 
+  static async getFile (auth: OAuthBearer, fileId: string): Promise<DriveFile> {
+    let url = `https://www.googleapis.com/drive/v2/files/${fileId}`
+
+    const result = await this.authFetch(url, auth.token)
+    const data = await result.json()
+
+    if (result.ok) return data
+    else throw data
+  }
+
   /**
    * Return list of files
    */
@@ -121,6 +136,43 @@ class GoogleService {
 
     if (!result.ok) throw data
     return data
+  }
+
+  /**
+   * Adds email with permission to file. If successful, returns the permission id
+   */
+  static async addEmailToFilePermission (auth: OAuthBearer, fileId: string, email: string, permission: 'read' | 'write', options: Partial<AddPermissionOptions> = {}): Promise<string> {
+    const urlPath = `https://www.googleapis.com/drive/v2/files${fileId}/permissions`
+    const queryParam = qs.stringify(options)
+    const body = JSON.stringify({
+      role: permission,
+      type: 'user',
+      value: email
+    })
+
+    const url = `${urlPath}?${queryParam}`
+    const result = await this.authFetch(url, auth.token, {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body
+    })
+
+    const data = await result.json()
+    if (result.ok) return data.id
+    else throw data // Parse these to provide more insightful errors (BOOM0)
+  }
+
+  /**
+   * Removes permission from a file
+   */
+  static async removePermissionFromFile (auth: OAuthBearer, fileId: string, permissionId: string) {
+    const urlPath = `https://www.googleapis.com/drive/v2/files${fileId}/permissions/${permissionId}`
+
+    const result = await this.authFetch(urlPath, auth.token, { method: 'DELETE' })
+
+    if (result.ok) return
+    else throw new Error('Could not remove permission')
+
   }
 
   /**

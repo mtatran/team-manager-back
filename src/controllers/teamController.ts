@@ -1,9 +1,10 @@
 
 import { Request, Response, NextFunction } from 'express'
+import * as Boom from 'boom'
 import TeamService from '../services/teamService'
 import UserService from '../services/userService'
 import * as TeamPresentation from '../presentations/teamPresentation'
-import Team from '../models/team'
+import Team, { File } from '../models/team'
 import User from '../models/user'
 
 export default class UserController {
@@ -63,6 +64,72 @@ export default class UserController {
       await TeamService.addUserToTeam(user, team)
 
       res.json({message: 'done'})
+    } catch (e) {
+      return next(e)
+    }
+  }
+
+  /**
+   * @apiDefine controller_team_add_file
+   *
+   * @apiParam {String} teamId Should be the valid mongodb team id
+   * @apiParam {String} fileId Should be the file id from google drive
+   * @apiParam {String} permission Can be either 'read' or 'write'
+   *
+   * @apiParamExample {JSON} Request-Example:
+    {
+      permission: "read"
+    }
+   */
+  public static async addFileToTeam (req: Request, res: Response, next: NextFunction) {
+    let team: Team = req.context.team
+    let user: User = req.context.user
+    const permission: string = req.body.permission
+    const fileId: string = req.params.fileId
+
+    if (permission !== 'read' && permission !== 'write') {
+      next(Boom.badRequest('Permission must be either "read" or "write"'))
+      return
+    }
+
+    let matchingFile = team.files.find(file => file.fileId === fileId)
+
+    try {
+      if (matchingFile) { // File already exists as a part of the team, info just needs to be updated
+        matchingFile.ownerId = user.id
+        matchingFile.permission = permission
+        await TeamService.save(team)
+        res.json(matchingFile)
+        return
+      }
+
+      const file = new File()
+      file.fileId = fileId
+      file.ownerId = user.id
+      file.permission = permission
+
+      team.files.push(file)
+      await TeamService.save(team)
+      res.json(file)
+      return
+    } catch (e) {
+      return next(e)
+    }
+  }
+
+  /**
+   * @apiDefine controller_team_remove_file
+   *
+   * @apiParam {String} teamId Should be the valid mongodb team id
+   * @apiParam {String} fileId Should be the file id from google drive
+   */
+  public static async removeFileFromTeam (req: Request, res: Response, next: NextFunction) {
+    let team: Team = req.context.team
+    const fileId: string = req.params.fileId
+
+    team.files = team.files.filter(file => file.fileId === fileId)
+    try {
+      await TeamService.save(team)
     } catch (e) {
       return next(e)
     }

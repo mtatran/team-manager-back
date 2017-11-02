@@ -3,7 +3,7 @@ import { sign } from 'jsonwebtoken'
 
 import User, { UserPosition } from '../models/user'
 import Team from '../models/team'
-import BaseModelService from './baseModelService'
+import BaseModelService from './base/modelService'
 import { JwtToken, PositionLevel } from '../types'
 
 class UserService extends BaseModelService<User> {

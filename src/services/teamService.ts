@@ -1,6 +1,6 @@
 import Team, { TeamPosition } from '../models/team'
 import User from '../models/user'
-import BaseModelService from './baseModelService'
+import BaseModelService from './base/modelService'
 import { PositionLevel } from '../types'
 
 class TeamService extends BaseModelService<Team> {
