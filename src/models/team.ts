@@ -1,10 +1,13 @@
 import { Entity, Column, ObjectID } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
 import { PositionLevel } from '../types'
+import { DriveFile } from '../services/googleService'
 import Base from './base'
 import User from './user'
 
-export class TeamPosition extends Base {
+type FilePermission = 'read' | 'write'
+
+export class TeamPosition {
   @Column({ enum: PositionLevel })
   level: PositionLevel
 
@@ -12,6 +15,19 @@ export class TeamPosition extends Base {
   userId: ObjectID
 
   user?: User
+}
+
+export class File {
+  @Column()
+  fileId: string
+
+  @Column()
+  ownerId: ObjectID
+
+  @Column()
+  permission: FilePermission
+
+  file?: DriveFile
 }
 
 @Entity()
@@ -22,4 +38,7 @@ export default class Team extends Base {
 
   @Column(type => TeamPosition)
   positions: TeamPosition[] = []
+
+  @Column(type => File)
+  files: File[] = []
 }

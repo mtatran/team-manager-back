@@ -57,8 +57,6 @@ class GoogleController {
   getFiles = async (req: Request, res: Response, next: NextFunction) => {
     const user: AuthedUser = req.user
     try {
-      await this.prepareUserAuthentication(user)
-
       const options: DriveListOptions = {
         pageSize: req.query.pageSize || 50,
         q: req.query.q,
@@ -77,15 +75,15 @@ class GoogleController {
    * Will refresh tokens if needed and will throw an error if the user
    * has never authenticated to google before
    */
-  private async prepareUserAuthentication (user: AuthedUser): Promise<void> {
-    if (GoogleService.isAuthenticated(user.googleAuth)) return
+  // private async prepareUserAuthentication (user: AuthedUser): Promise<void> {
+  //   if (GoogleService.isAuthenticated(user.googleAuth)) return
 
-    const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)
+  //   const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)
 
-    user.googleAuth.token = newBearer.token
-    user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
-    await UserService.save(user)
-  }
+  //   user.googleAuth.token = newBearer.token
+  //   user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
+  //   await UserService.save(user)
+  // }
 }
 
 export default new GoogleController()

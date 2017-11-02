@@ -4,8 +4,11 @@ import { Router } from 'express'
 import TeamController from '../controllers/teamController'
 
 // Policies
+import isAuthenticated from '../policies/isAuthenticated'
+import isGoogleAuthenticated from '../policies/isGoogleAuthenticated'
 import isValidTeam from '../policies/isValidTeam'
 import isValidUser from '../policies/isValidUser'
+import isValidGoogleFile from '../policies/isValidGoogleFile'
 
 const router = Router()
 
@@ -17,7 +20,7 @@ const router = Router()
  *
  * @apiUse controller_team_create
  */
-router.post('/create', [], TeamController.create)
+router.post('/create', [isAuthenticated], TeamController.create)
 
 /**
  * @api {POST} /teams/:teamId/add Add User
@@ -27,7 +30,7 @@ router.post('/create', [], TeamController.create)
  *
  * @apiUse controller_team_add_user
  */
-router.post('/:teamId/add', [isValidTeam, isValidUser], TeamController.addUser)
+router.post('/:teamId/add', [isAuthenticated, isValidTeam, isValidUser], TeamController.addUser)
 
 /**
  * @api {GET} /teams/:teamId Get Team Info
@@ -38,5 +41,27 @@ router.post('/:teamId/add', [isValidTeam, isValidUser], TeamController.addUser)
  * @apiUse success_team_full
  */
 router.get('/:teamId', [isValidTeam], TeamController.getTeam)
+
+/**
+ * @api {POST} /teams/:teamId/file/:fileId Add file to team
+ * @apiName addFileToTeam
+ * @apiGroup Teams
+ * @apiVersion 1.0.0
+ *
+ * @apiUse controller_team_add_file
+ */
+router.post('/:teamId/file/:fileId', [isAuthenticated, isGoogleAuthenticated, isValidTeam, isValidGoogleFile],
+  TeamController.addFileToTeam)
+
+/**
+ * @api {DELETE} /teams/:teamId/file/:fileId Add file to team
+ * @apiName addFileToTeam
+ * @apiGroup Teams
+ * @apiVersion 1.0.0
+ *
+ * @apiUse controller_team_remove_file
+ */
+router.delete('/:teamId/file/:fileId', [isAuthenticated, isGoogleAuthenticated, isValidTeam],
+  TeamController.removeFileFromTeam)
 
 export default router
