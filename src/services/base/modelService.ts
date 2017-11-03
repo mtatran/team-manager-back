@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb'
 import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
-import Populater, { PopulatePair, PopulateOptions, ResolveObjects } from '../../utils/populater'
+import Populater, { PopulatePair, PopulateOptions, ResolveHashMap } from '../../utils/populater'
 import Base from '../../models/base'
 import PopulateService from './populateService'
 
@@ -75,5 +75,4 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
   }
   protected objectToId (obj: Base) { return obj.id }
   protected idToString (id: ObjectId) { return id.toHexString() }
-  protected idEquals (id1: ObjectId, id2: ObjectId) { return id1.equals(id2) }
 }

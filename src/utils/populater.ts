@@ -19,9 +19,8 @@ export interface PopulateOptions {
   strict: boolean
 }
 
-export interface ResolveObjects {
-  id: any
-  payload: any
+export interface ResolveHashMap {
+  [key: string]: any
 }
 
 export default class Populater {
@@ -37,10 +36,10 @@ export default class Populater {
     this.finishedPairs = this.getAllInternalPairs()
   }
 
-  resolve (resolveObjects: ResolveObjects[], predicate: (a: any, b: any) => boolean) {
+  resolve (resolveHashMap: ResolveHashMap, idToString: (id: any) => string) {
     this.finishedPairs.forEach(pair => {
-      const obj = resolveObjects.find(resObj => predicate(resObj.id, pair.id))
-      if (obj) pair.resolve(obj.payload)
+      const obj = resolveHashMap[idToString(pair.id)]
+      if (obj) pair.resolve(obj)
       else if (this.strict) {
         throw new Error(`Pair with id ${pair.id} could not be populated`)
       }
