@@ -1,18 +1,20 @@
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
 import Populater, { PopulatePair, PopulateOptions, ResolveObjects } from '../../utils/populater'
 import Base from '../../models/base'
+import PopulateService from './populateService'
 
 interface QueryOptions {
   includeAll: boolean
 }
 
-export default class BaseModelService<T extends Base> {
+export default class BaseModelService<T extends Base> extends PopulateService<Base, ObjectId> {
   private repo: Repository<T>
 
   constructor (model: any) {
+    super()
     this.repo = getRepository(model)
   }
 
@@ -26,11 +28,11 @@ export default class BaseModelService<T extends Base> {
     await this.repo.save(obj)
   }
 
-  findOneById (id: ObjectID | string, opts?: QueryOptions ) {
+  findOneById (id: ObjectId | string, opts?: QueryOptions ) {
     let documentID
 
     if (typeof id === 'string') {
-      documentID = new ObjectID(id as string)
+      documentID = new ObjectId(id as string)
     } else {
       documentID = id
     }
@@ -63,22 +65,15 @@ export default class BaseModelService<T extends Base> {
 
   getRepo = () => this.repo
 
-  async populate (docs: Object | Object[], paths: PopulatePair[], options: Partial<PopulateOptions> = {}) {
-    const populater = new Populater(docs, paths, options)
-    const neededIds = _.uniqBy(populater.neededIds, (id: ObjectID) => id.toString())
-
-    const results: T[] = await this.findMany({
-      where: { _id: { $in: neededIds } }
+  /**
+   *  The following methods are implemented for the populateService base class
+   */
+  protected findNeededObjects (ids: ObjectId[]): Promise<Base[]> {
+    return this.findMany({
+      where: { _id: { $in: ids } }
     })
-
-    /**
-     * @todo: Maybe optimize this by using a hashmap
-     */
-    const resolveObjectArray: ResolveObjects[] = results.map(res => ({
-      id: res.id,
-      payload: res
-    }))
-
-    populater.resolve(resolveObjectArray, (a: ObjectID, b: ObjectID) => a.equals(b))
   }
+  protected objectToId (obj: Base) { return obj.id }
+  protected idToString (id: ObjectId) { return id.toHexString() }
+  protected idEquals (id1: ObjectId, id2: ObjectId) { return id1.equals(id2) }
 }
