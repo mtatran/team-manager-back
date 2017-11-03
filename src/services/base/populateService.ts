@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import Populater, { PopulatePair, PopulateOptions, ResolveObjects } from '../../utils/populater'
+import Populater, { PopulatePair, PopulateOptions, ResolveHashMap } from '../../utils/populater'
 
 export default abstract class PopulateService<Type, Key> {
 
@@ -12,16 +12,15 @@ export default abstract class PopulateService<Type, Key> {
     /**
      * @todo: Maybe optimize this by using a hashmap
      */
-    const resolveObjectArray: ResolveObjects[] = results.map(res => ({
-      id: this.idToString(this.objectToId(res)),
-      payload: res
-    }))
+    const resolveHashMap: ResolveHashMap = results.reduce((pre: ResolveHashMap, curr) => ({
+      ...pre,
+      [this.idToString(this.objectToId(curr))]: curr
+    }), {})
 
-    populater.resolve(resolveObjectArray, this.idEquals)
+    populater.resolve(resolveHashMap, this.idToString)
   }
 
   protected abstract async findNeededObjects (ids: Key[]): Promise<Type[]>
   protected abstract objectToId (obj: Type): Key
   protected abstract idToString (id: Key): string
-  protected abstract idEquals (id1: Key, id2: Key): boolean
 }
