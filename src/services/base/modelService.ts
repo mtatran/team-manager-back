@@ -68,9 +68,9 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
   /**
    *  The following methods are implemented for the populateService base class
    */
-  protected findNeededObjects (ids: ObjectId[]): Promise<Base[]> {
+  protected findNeededObjects (ids: ObjectId[], idField: string = '_id'): Promise<Base[]> {
     return this.findMany({
-      where: { _id: { $in: ids } }
+      where: { [idField]: { $in: ids } }
     })
   }
   protected objectToId (obj: Base) { return obj.id }
