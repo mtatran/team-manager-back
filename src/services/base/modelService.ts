@@ -1,8 +1,6 @@
 import { ObjectId } from 'mongodb'
-import * as _ from 'lodash'
 import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
-import Populater, { PopulatePair, PopulateOptions, ResolveHashMap } from '../../utils/populater'
 import Base from '../../models/base'
 import PopulateService from './populateService'
 
