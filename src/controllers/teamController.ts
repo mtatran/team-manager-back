@@ -83,7 +83,7 @@ export default class UserController {
    */
   public static async addFileToTeam (req: Request, res: Response, next: NextFunction) {
     let team: Team = req.context.team
-    let user: User = req.context.user
+    let user: User = req.user
     const permission: string = req.body.permission
     const fileId: string = req.params.fileId
 
@@ -139,4 +139,10 @@ export default class UserController {
     const team: Team = req.context.team
     res.json(TeamPresentation.fullTeam(team))
   }
+
+  private add
+
+
+
+
 }
