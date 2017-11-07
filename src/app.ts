@@ -28,7 +28,9 @@ app.use('/api', api)
 app.use((err: Boom.BoomError, req: Request, res: Response, next: NextFunction) => {
   log.error(err)
 
-  res.json({ error: err.message })
+  const statusCode = (err.isBoom && err.output.statusCode) || 500
+
+  res.status(statusCode).json({ error: err.message })
 })
 
 export default app

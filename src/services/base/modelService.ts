@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { getRepository, Repository, FindManyOptions, FindOneOptions } from 'typeorm'
+import { getRepository, Repository, FindManyOptions, FindOneOptions, ObjectID } from 'typeorm'
 import { validate, ValidationError } from 'class-validator'
 import Base from '../../models/base'
 import PopulateService from './populateService'
@@ -8,7 +8,7 @@ interface QueryOptions {
   includeAll: boolean
 }
 
-export default class BaseModelService<T extends Base> extends PopulateService<Base, ObjectId> {
+export default class BaseModelService<T extends Base> extends PopulateService<Base, ObjectID> {
   private repo: Repository<T>
 
   constructor (model: any) {
@@ -26,7 +26,7 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
     await this.repo.save(obj)
   }
 
-  findOneById (id: ObjectId | string, opts?: QueryOptions ) {
+  findOneById (id: ObjectID | string, opts?: QueryOptions ) {
     let documentID
 
     if (typeof id === 'string') {
@@ -66,11 +66,11 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
   /**
    *  The following methods are implemented for the populateService base class
    */
-  protected findNeededObjects (ids: ObjectId[], idField: string = '_id'): Promise<Base[]> {
+  protected findNeededObjects (ids: ObjectID[], idField: string = '_id'): Promise<Base[]> {
     return this.findMany({
       where: { [idField]: { $in: ids } }
     })
   }
   protected objectToId (obj: Base) { return obj.id }
-  protected idToString (id: ObjectId) { return id.toHexString() }
+  protected idToString (id: ObjectID) { return id.toHexString() }
 }
