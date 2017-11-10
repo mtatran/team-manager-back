@@ -92,17 +92,7 @@ export default class UserController {
       return
     }
 
-    let matchingFile = team.files.find(file => file.fileId === fileId)
-
     try {
-      if (matchingFile) { // File already exists as a part of the team, info just needs to be updated
-        matchingFile.ownerId = user.id
-        matchingFile.permission = permission
-        await TeamService.save(team)
-        res.json(matchingFile)
-        return
-      }
-
       const file = new File()
       file.fileId = fileId
       file.ownerId = user.id
@@ -110,6 +100,10 @@ export default class UserController {
 
       team.files.push(file)
       await TeamService.save(team)
+
+      const userIds = team.positions.map(pos => pos.userId)
+      const usersInTeam = UserService.findMany({ where: { _id: { $in: userIds } } })
+
       res.json(file)
       return
     } catch (e) {
@@ -139,10 +133,5 @@ export default class UserController {
     const team: Team = req.context.team
     res.json(TeamPresentation.fullTeam(team))
   }
-
-  private add
-
-
-
 
 }

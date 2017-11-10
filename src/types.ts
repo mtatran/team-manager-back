@@ -2,7 +2,8 @@ import { ObjectID } from 'typeorm'
 
 export enum Authority {
   member = 'member',
-  admin = 'admin'
+  admin = 'admin',
+  superAdmin = 'superAdmin'
 }
 
 export enum PositionLevel {

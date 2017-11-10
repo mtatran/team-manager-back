@@ -19,11 +19,20 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
   /**
    * Saves the given document but validates it first
    */
-  async save (obj: T): Promise<Error | ValidationError | void> {
+  async save (obj: T[] | T): Promise<Error | ValidationError | void> {
     const validationResult = await validate(obj)
     if (validationResult.length) throw validationResult
 
-    await this.repo.save(obj)
+    /**
+     * This has to be done because the save method in typeorm is defined with
+     * overloaded signatures instead of T | T[]. Typescript must think we're calling
+     * two different methods here
+     */
+    if (Array.isArray(obj)) {
+      await this.repo.save(obj)
+    } else {
+      await this.repo.save(obj)
+    }
   }
 
   findOneById (id: ObjectID | string, opts?: QueryOptions ) {

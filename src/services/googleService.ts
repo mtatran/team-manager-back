@@ -71,7 +71,8 @@ class GoogleService {
       redirect_uri: this.CALLBACK_URL,
       scope: 'https://www.googleapis.com/auth/drive',
       access_type: 'offline',
-      response_type: 'code'
+      response_type: 'code',
+      prompt: 'consent'
     }
 
     return `${this.USER_REDIRECT}?${qs.stringify(params)}`

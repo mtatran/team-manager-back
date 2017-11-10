@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import UserService from '../services/userService'
 import * as UserPresentation from '../presentations/userPresentation'
 import User from '../models/user'
+import { Authority } from '../types'
 
 export default class UserController {
   /**
@@ -14,6 +15,7 @@ export default class UserController {
    * @apiParam {String} lastName
    * @apiParam {String} [phoneNumber]
    * @apiParam {String} password
+   * @apiParam {String} authority
    *
    * @apiParamExample  {JSON} Request-Example:
      {
@@ -33,6 +35,7 @@ export default class UserController {
     user.lastName = req.body.lastName
     user.phoneNumber = req.body.phoneNumber
     user.password = req.body.password
+    user.authority = Authority.member
 
     try {
       await UserService.create(user)
