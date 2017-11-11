@@ -1,8 +1,8 @@
-import { CreateDateColumn, UpdateDateColumn, ObjectIdColumn, ObjectID } from 'typeorm'
+import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm'
 
 export default class Base {
-  @ObjectIdColumn()
-  id: ObjectID
+  @PrimaryGeneratedColumn()
+  id: number
 
   @CreateDateColumn()
   createDate: Date

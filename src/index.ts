@@ -6,13 +6,17 @@ import log from './utils/log'
 
 config()  // Import .env file
 
+function stringIsTruthy (str: String | undefined): boolean {
+  let s = (str || '').toLowerCase()
+
+  return s === 'true' || s === '1'
+}
+
 const connectionSettings: ConnectionOptions = {
-  type: 'mongodb',
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT) || 3306,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE || 'TeamManager',
+  url: process.env.DB_URL,
+  type: 'mariadb',
+  synchronize: stringIsTruthy(process.env.DB_SYNC),
+  logging: stringIsTruthy(process.env.DB_LOGGING),
   entities: [path.join(__dirname, 'models/**/*')]
 }
 

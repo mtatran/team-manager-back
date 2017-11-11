@@ -1,31 +1,45 @@
-import { Entity, Column, ObjectID } from 'typeorm'
+import { Entity, Column, OneToOne, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
 import { PositionLevel } from '../types'
 import { DriveFile } from '../services/googleService'
 import Base from './base'
 import User from './user'
+import Authentication from './authentication'
 
-type FilePermission = 'read' | 'write'
+enum FilePermission {
+  read = 'read',
+  write = 'write'
+}
 
 export class TeamPosition {
   @Column({ enum: PositionLevel })
   level: PositionLevel
 
-  @Column()
-  userId: ObjectID
+  @OneToOne(type => User, { eager: true, cascadeAll: true })
+  @JoinColumn()
+  user: User
 
-  user?: User
+  @ManyToOne(type => Team, team => team.positions)
+  team: Team
 }
 
 export class File {
   @Column()
   fileId: string
 
-  @Column()
-  ownerId: ObjectID
+  @OneToOne(type => User)
+  @JoinColumn()
+  owner: User
 
-  @Column()
+  @Column('enum', { enum: FilePermission })
   permission: FilePermission
+
+  @OneToOne(type => Authentication, { eager: true })
+  @JoinColumn()
+  authentication: Authentication
+
+  @ManyToOne(type => Team, team => team.files)
+  team: Team
 
   file?: DriveFile
 }
@@ -36,9 +50,14 @@ export default class Team extends Base {
   @Column({ unique: true, length: 20})
   name: string
 
-  @Column(type => TeamPosition)
-  positions: TeamPosition[] = []
+  @OneToMany(type => TeamPosition, teamPos => teamPos.team, {
+    cascadeUpdate: true,
+    eager: true
+  })
+  positions: TeamPosition[]
 
-  @Column(type => File)
-  files: File[] = []
+  @OneToMany(type => File, file => file.team, {
+    eager: true
+  })
+  files: File[]
 }

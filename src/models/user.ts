@@ -1,28 +1,20 @@
-import { Entity, Column, ObjectID } from 'typeorm'
+import { Entity, Column, JoinColumn, OneToOne, OneToMany, ManyToOne } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
 import Base from './base'
 import Team from './team'
+import Authentication from './authentication'
 import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
 
 export class UserPosition extends Base {
   @Column({ enum: PositionLevel })
   level: PositionLevel
 
-  @Column()
-  teamId: ObjectID
+  @OneToOne(type => Team, { eager: true, cascadeAll: true })
+  @JoinColumn()
+  team: Team
 
-  team?: Team
-}
-
-export class GoogleAuthentication implements OAuthBearerWithRefresh {
-  @Column()
-  refreshToken: string
-
-  @Column()
-  token: string
-
-  @Column()
-  tokenExpireDate: Date
+  @ManyToOne(type => User, user => user.positions)
+  user: User
 }
 
 @Entity()
@@ -42,7 +34,7 @@ export default class User extends Base {
 
   @IsOptional()
   @Column({ nullable: true })
-  address: string
+  address?: string
 
   @IsOptional()
   @IsMobilePhone('en-CA')
@@ -58,24 +50,24 @@ export default class User extends Base {
 
   @IsBoolean()
   @Column({ default: false })
-  slackAccess: boolean = false
+  slackAccess: boolean
 
   @IsOptional()
   @IsString()
   @Column({ unique: true, length: 50, default: null, nullable: true })
-  slackTag: string
+  slackTag?: string
 
-  @Column(type => GoogleAuthentication)
-  googleAuth?: GoogleAuthentication
+  @OneToOne(type => Authentication, {
+    nullable: true,
+    eager: true,
+    cascadeAll: true
+  })
+  googleAuth?: Authentication
 
-  @IsBoolean()
-  @Column({ default: false })
-  driveAccess: boolean = false
-
-  @IsBoolean()
-  @Column({ default: false })
-  facebookAccess: boolean = false
-
-  @Column(type => UserPosition)
-  positions: UserPosition[] = []
+  @OneToMany(type => UserPosition, userPos => userPos.user, {
+    cascadeInsert: true,
+    cascadeUpdate: true,
+    eager: true
+  })
+  positions: UserPosition[]
 }
