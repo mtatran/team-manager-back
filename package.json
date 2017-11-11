@@ -44,15 +44,13 @@
     "googleapis": "^22.2.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
-    "mongodb": "^2.2.33",
+    "mysql": "^2.15.0",
     "node-fetch": "^1.7.3",
-    "node-persist": "^2.1.0",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.0",
     "passport-local": "^1.0.0",
     "qs": "^6.5.1",
     "reflect-metadata": "^0.1.10",
-    "tslint-config-standard": "^6.0.1",
     "typeorm": "^0.1.0"
   },
   "devDependencies": {
@@ -76,6 +74,7 @@
     "nodemon": "^1.12.1",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
+    "tslint-config-standard": "^6.0.1",
     "typescript": "^2.5.3"
   }
 }
