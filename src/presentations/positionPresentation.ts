@@ -13,7 +13,6 @@ import { partialUser } from './userPresentation'
  */
 export const teamPosition = (position: TeamPosition) => ({
   level: position.level,
-  userId: position.userId.toString(),
   user: position.user && partialUser(position.user)
 })
 
@@ -27,6 +26,5 @@ export const teamPosition = (position: TeamPosition) => ({
  */
 export const userPosition = (position: UserPosition) => ({
   level: position.level,
-  teamId: position.teamId.toString(),
   team: position.team && partialTeam(position.team)
 })

@@ -29,7 +29,6 @@ export default (app: Application) => {
   app.use((req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('jwt', (err: Error, user: User, info: any) => {
       if (err) return next(err)
-      if (info) return next(Boom.unauthorized(info.message))
       if (user) req.user = user
       next()
     })(req, res, next)

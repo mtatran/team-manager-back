@@ -5,18 +5,6 @@ import Team from './team'
 import Authentication from './authentication'
 import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
 
-export class UserPosition extends Base {
-  @Column({ enum: PositionLevel })
-  level: PositionLevel
-
-  @OneToOne(type => Team, { eager: true, cascadeAll: true })
-  @JoinColumn()
-  team: Team
-
-  @ManyToOne(type => User, user => user.positions)
-  user: User
-}
-
 @Entity()
 export default class User extends Base {
   @IsAlpha({message: 'You can only have letters in your name'})
@@ -50,7 +38,7 @@ export default class User extends Base {
 
   @IsBoolean()
   @Column({ default: false })
-  slackAccess: boolean
+  slackAccess: boolean = false
 
   @IsOptional()
   @IsString()
@@ -70,4 +58,17 @@ export default class User extends Base {
     eager: true
   })
   positions: UserPosition[]
+}
+
+@Entity()
+export class UserPosition extends Base {
+  @Column('enum', { enum: PositionLevel })
+  level: PositionLevel
+
+  @OneToOne(type => Team, { eager: true, cascadeAll: true })
+  @JoinColumn()
+  team: Team
+
+  @ManyToOne(type => User, user => user.positions)
+  user: User
 }

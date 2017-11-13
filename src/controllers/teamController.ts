@@ -6,6 +6,7 @@ import UserService from '../services/userService'
 import * as TeamPresentation from '../presentations/teamPresentation'
 import Team, { File } from '../models/team'
 import User from '../models/user'
+import { FilePermission } from '../types'
 
 export default class UserController {
   /**
@@ -87,7 +88,7 @@ export default class UserController {
     const permission: string = req.body.permission
     const fileId: string = req.params.fileId
 
-    if (permission !== 'read' && permission !== 'write') {
+    if (!(permission in FilePermission)) {
       next(Boom.badRequest('Permission must be either "read" or "write"'))
       return
     }
@@ -95,14 +96,12 @@ export default class UserController {
     try {
       const file = new File()
       file.fileId = fileId
-      file.ownerId = user.id
-      file.permission = permission
+      file.owner = user
+      file.permission = (permission as FilePermission)
 
       team.files.push(file)
       await TeamService.save(team)
 
-      const userIds = team.positions.map(pos => pos.userId)
-      const usersInTeam = UserService.findMany({ where: { _id: { $in: userIds } } })
 
       res.json(file)
       return

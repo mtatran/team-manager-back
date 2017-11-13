@@ -3,11 +3,12 @@ import * as Boom from 'boom'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import UserService from '../services/userService'
-import User, { GoogleAuthentication } from '../models/user'
+import User from '../models/user'
+import Authentication from '../models/authentication'
 import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
 
 interface AuthedUser extends User {
-  googleAuth: GoogleAuthentication
+  googleAuth: Authentication
 }
 
 class GoogleController {
@@ -32,7 +33,7 @@ class GoogleController {
       return next(Boom.conflict('Do not need to reauthenticate to google'))
     }
 
-    user.googleAuth = bearer as OAuthBearerWithRefresh
+    user.googleAuth = (bearer as Authentication)
     await UserService.save(user)
     /**
      * @todo should redirect page to a react page

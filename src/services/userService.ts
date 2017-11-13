@@ -27,7 +27,9 @@ class UserService extends BaseModelService<User> {
    * Trys to find a user given the login credentials
    */
   async findByLogin ( email: string, password: string ) {
-    const user = await this.getRepo().findOne({ where: { email }})
+    const user = await this.getRepo().findOne({
+      where: { email: email }
+    })
     if (!user) return null
 
     const passwordMatch = await compare(password, user.password)
@@ -56,7 +58,7 @@ class UserService extends BaseModelService<User> {
    */
   async addTeamToUser (team: Team, user: User, level: PositionLevel = PositionLevel.member) {
     // Check if user is already part of the team
-    const teamPositionOnUser = user.positions.find(pos => pos.teamId.equals(team.id))
+    const teamPositionOnUser = user.positions.find(pos => pos.team.id === team.id)
 
     // If the position already exists, change the level and save
     if (teamPositionOnUser) {
@@ -65,7 +67,7 @@ class UserService extends BaseModelService<User> {
     }
 
     const position = new UserPosition()
-    position.teamId = team.id
+    position.team = team
     position.level = level
 
     user.positions.push(position)
