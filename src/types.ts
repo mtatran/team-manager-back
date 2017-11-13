@@ -13,7 +13,7 @@ export enum PositionLevel {
 }
 
 export interface JwtToken {
-  id: ObjectID
+  id: Number
   email: string
   authority: Authority
 }
@@ -26,4 +26,9 @@ export interface OAuthBearer {
 
 export interface OAuthBearerWithRefresh extends OAuthBearer {
   refreshToken: string
+}
+
+export enum FilePermission {
+  read = 'read',
+  write = 'write'
 }

@@ -17,7 +17,7 @@ class TeamService extends BaseModelService<Team> {
    */
   async addUserToTeam (user: User, team: Team, level: PositionLevel = PositionLevel.member) {
     // Check if user is already part of the team
-    const userPositionOnTeam = team.positions.find(pos => pos.userId.equals(team.id))
+    const userPositionOnTeam = team.positions.find(pos => pos.user.id === user.id)
 
     // If the position already exists, change the level and save
     if (userPositionOnTeam) {
@@ -26,7 +26,7 @@ class TeamService extends BaseModelService<Team> {
     }
 
     const position = new TeamPosition()
-    position.userId = user.id
+    position.user = user
     position.level = level
 
     team.positions.push(position)

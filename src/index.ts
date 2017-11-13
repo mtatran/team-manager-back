@@ -14,7 +14,7 @@ function stringIsTruthy (str: String | undefined): boolean {
 
 const connectionSettings: ConnectionOptions = {
   url: process.env.DB_URL,
-  type: 'mariadb',
+  type: 'mysql',
   synchronize: stringIsTruthy(process.env.DB_SYNC),
   logging: stringIsTruthy(process.env.DB_LOGGING),
   entities: [path.join(__dirname, 'models/**/*')]
