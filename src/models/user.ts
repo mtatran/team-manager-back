@@ -50,12 +50,12 @@ export default class User extends Base {
     eager: true,
     cascadeAll: true
   })
+  @JoinColumn()
   googleAuth?: Authentication
 
   @OneToMany(type => UserPosition, userPos => userPos.user, {
     cascadeInsert: true,
-    cascadeUpdate: true,
-    eager: true
+    cascadeUpdate: true
   })
   positions: UserPosition[]
 }
@@ -65,7 +65,7 @@ export class UserPosition extends Base {
   @Column('enum', { enum: PositionLevel })
   level: PositionLevel
 
-  @OneToOne(type => Team, { eager: true, cascadeAll: true })
+  @OneToOne(type => Team, { cascadeAll: true })
   @JoinColumn()
   team: Team
 

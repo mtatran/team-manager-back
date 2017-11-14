@@ -55,20 +55,20 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
   }
 
   parseOpts (opts?: QueryOptions): Object | undefined {
-    if (!opts) return undefined
-
     let options: any = {}
-    return options
+
+    return { ...options, ...this._parseOpts(opts) }
   }
 
   getRepo = () => this.repo
 
+  protected _parseOpts (opts?: QueryOptions): Object | undefined { return {} }
   /**
    *  The following methods are implemented for the populateService base class
    */
   protected findNeededObjects (ids: number[], idField: string = '_id'): Promise<Base[]> {
     return this.findMany({
-      where: { [idField]: { $in: ids } }
+      where: { [idField]: ids }
     })
   }
   protected objectToId (obj: Base) { return obj.id }

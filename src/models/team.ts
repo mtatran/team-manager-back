@@ -14,6 +14,7 @@ export default class Team extends Base {
 
   @OneToMany(type => TeamPosition, teamPos => teamPos.team, {
     cascadeUpdate: true,
+    cascadeInsert: true,
     eager: true
   })
   positions: TeamPosition[]
@@ -29,7 +30,7 @@ export class TeamPosition extends Base {
   @Column('enum', { enum: PositionLevel })
   level: PositionLevel
 
-  @OneToOne(type => User, { eager: true, cascadeAll: true })
+  @OneToOne(type => User, { cascadeAll: true })
   @JoinColumn()
   user: User
 
