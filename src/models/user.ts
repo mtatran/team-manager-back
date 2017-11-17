@@ -65,7 +65,7 @@ export class UserPosition extends Base {
   @Column('enum', { enum: PositionLevel })
   level: PositionLevel
 
-  @OneToOne(type => Team, { cascadeAll: true })
+  @OneToOne(type => Team)
   @JoinColumn()
   team: Team
 

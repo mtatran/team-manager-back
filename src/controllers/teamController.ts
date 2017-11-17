@@ -102,7 +102,6 @@ export default class UserController {
       team.files.push(file)
       await TeamService.save(team)
 
-
       res.json(file)
       return
     } catch (e) {

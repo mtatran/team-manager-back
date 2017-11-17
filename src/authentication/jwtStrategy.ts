@@ -20,7 +20,7 @@ const options = {
 
 export default new Strategy(options, async (jwt, done) => {
   try {
-    const user = await UserService.findOneById(jwt.id)
+    const user = await UserService.findOneById(jwt.id, { includeAll: true })
 
     if (user) {
       return done(null, user)
