@@ -4,6 +4,15 @@ import BaseModelService from './base/modelService'
 import { PositionLevel } from '../types'
 
 class TeamService extends BaseModelService<Team> {
+
+  joinAllDefinition = {
+    alias: 'team',
+    leftJoinAndSelect: {
+      positions: 'team.positions',
+      files: 'team.files'
+    }
+  }
+
   constructor () {
     super(Team)
   }

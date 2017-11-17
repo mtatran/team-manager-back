@@ -8,11 +8,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
 
   const user = await UserService.findOneById(userId, { includeAll: true })
 
-  if (user) {
-    await TeamService.populateTeamsOnUser(user)
-    req.context.user = user
-    return next()
+  if (!user) {
+    return next(Boom.badRequest('User does not exist'))
   }
 
-  return next(Boom.badRequest('User does not exist'))
+  req.context.user = user
+  return next()
 }

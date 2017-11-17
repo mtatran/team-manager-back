@@ -7,7 +7,9 @@ interface QueryOptions {
   includeAll: boolean
 }
 
-export default class BaseModelService<T extends Base> extends PopulateService<Base, number> {
+export default abstract class BaseModelService<T extends Base> extends PopulateService<Base, number> {
+  abstract joinAllDefinition: Object
+
   private repo: Repository<T>
 
   constructor (model: any) {
@@ -54,15 +56,19 @@ export default class BaseModelService<T extends Base> extends PopulateService<Ba
     return this.repo.findOne(q)
   }
 
-  parseOpts (opts?: QueryOptions): Object | undefined {
+  parseOpts (opts: Partial<QueryOptions> = {}): Object | undefined {
     let options: any = {}
+
+    if (opts.includeAll) {
+      options.join = this.joinAllDefinition
+    }
 
     return { ...options, ...this._parseOpts(opts) }
   }
 
   getRepo = () => this.repo
 
-  protected _parseOpts (opts?: QueryOptions): Object | undefined { return {} }
+  protected _parseOpts (opts: Partial<QueryOptions> = {}): Object | undefined { return {} }
   /**
    *  The following methods are implemented for the populateService base class
    */

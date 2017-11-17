@@ -7,7 +7,7 @@
 
 import * as qs from 'qs'
 import fetch, { RequestInit, Response } from 'node-fetch'
-import { OAuthBearer } from '../types'
+import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
 const googleConfig = require('../../client_id.json')
 
 export interface TokenResponse {
@@ -60,6 +60,7 @@ class GoogleService {
   static AUTH_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
   static CALLBACK_URL = `${process.env.URL}/api/google/callback`
   static FILE_LIST_URL = 'https://www.googleapis.com/drive/v3/files'
+
 
   /**
    * Generates the URL that users should be redirected to the initiate
@@ -210,4 +211,4 @@ class GoogleService {
   }
 }
 
-export default GoogleService
+export default new GoogleService()

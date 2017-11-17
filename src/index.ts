@@ -20,6 +20,8 @@ const connectionSettings: ConnectionOptions = {
   entities: [path.join(__dirname, 'models/**/*')]
 }
 
+console.log(connectionSettings)
+
 // Make connection to database
 createConnection(connectionSettings).then(() => {
   // Start the server

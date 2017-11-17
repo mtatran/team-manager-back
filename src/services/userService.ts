@@ -7,6 +7,14 @@ import BaseModelService from './base/modelService'
 import { JwtToken, PositionLevel } from '../types'
 
 class UserService extends BaseModelService<User> {
+
+  joinAllDefinition = {
+    alias: 'user',
+    leftJoinAndSelect: {
+      positions: 'user.positions'
+    }
+  }
+
   constructor () {
     super(User)
   }
@@ -27,9 +35,10 @@ class UserService extends BaseModelService<User> {
    * Trys to find a user given the login credentials
    */
   async findByLogin ( email: string, password: string ) {
-    const user = await this.getRepo().findOne({
+    const user = await this.findOne({
       where: { email: email }
-    })
+    }, { includeAll: true })
+
     if (!user) return null
 
     const passwordMatch = await compare(password, user.password)
