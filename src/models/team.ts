@@ -4,6 +4,7 @@ import { PositionLevel, FilePermission } from '../types'
 import { DriveFile } from '../services/googleService'
 import Base from './base'
 import User from './user'
+import Position from './position'
 import Authentication from './authentication'
 
 @Entity()
@@ -12,30 +13,17 @@ export default class Team extends Base {
   @Column({ unique: true, length: 20})
   name: string
 
-  @OneToMany(type => TeamPosition, teamPos => teamPos.team, {
+  @OneToMany(type => Position, pos => pos.team, {
     cascadeUpdate: true,
     cascadeInsert: true,
     eager: true
   })
-  positions: TeamPosition[]
+  positions: Position[]
 
   @OneToMany(type => File, file => file.team, {
     eager: true
   })
   files: File[]
-}
-
-@Entity()
-export class TeamPosition extends Base {
-  @Column('enum', { enum: PositionLevel })
-  level: PositionLevel
-
-  @OneToOne(type => User)
-  @JoinColumn()
-  user: User
-
-  @ManyToOne(type => Team, team => team.positions)
-  team: Team
 }
 
 @Entity()

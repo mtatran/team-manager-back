@@ -3,6 +3,7 @@ import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsStrin
 import Base from './base'
 import Team from './team'
 import Authentication from './authentication'
+import Position from './position'
 import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
 
 @Entity()
@@ -53,22 +54,10 @@ export default class User extends Base {
   @JoinColumn()
   googleAuth?: Authentication
 
-  @OneToMany(type => UserPosition, userPos => userPos.user, {
+  @OneToMany(type => Position, pos => pos.user, {
     cascadeInsert: true,
-    cascadeUpdate: true
+    cascadeUpdate: true,
+    eager: true
   })
-  positions: UserPosition[]
-}
-
-@Entity()
-export class UserPosition extends Base {
-  @Column('enum', { enum: PositionLevel })
-  level: PositionLevel
-
-  @OneToOne(type => Team)
-  @JoinColumn()
-  team: Team
-
-  @ManyToOne(type => User, user => user.positions)
-  user: User
+  positions: Position[]
 }

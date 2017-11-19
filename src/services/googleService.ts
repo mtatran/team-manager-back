@@ -7,7 +7,7 @@
 
 import * as qs from 'qs'
 import fetch, { RequestInit, Response } from 'node-fetch'
-import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
+import { OAuthBearer, OAuthBearerWithRefresh, FilePermission } from '../types'
 const googleConfig = require('../../client_id.json')
 
 export interface TokenResponse {
@@ -44,6 +44,11 @@ export interface DriveFile {
   capabilities: DriveFileCapabilities
 }
 
+export interface DriveFilePermission {
+  role: FilePermission
+  emailAddress: string
+}
+
 export interface DriveListResponse {
   nextPageToken?: string
   incompleteSearch: boolean
@@ -60,7 +65,6 @@ class GoogleService {
   static AUTH_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
   static CALLBACK_URL = `${process.env.URL}/api/google/callback`
   static FILE_LIST_URL = 'https://www.googleapis.com/drive/v3/files'
-
 
   /**
    * Generates the URL that users should be redirected to the initiate
@@ -143,7 +147,7 @@ class GoogleService {
   /**
    * Adds email with permission to file. If successful, returns the permission id
    */
-  static async addEmailToFilePermission (auth: OAuthBearer, fileId: string, email: string, permission: 'read' | 'write', options: Partial<AddPermissionOptions> = {}): Promise<string> {
+  static async giveEmailFilePermission (auth: OAuthBearer, fileId: string, email: string, permission: FilePermission, options: Partial<AddPermissionOptions> = {}): Promise<string> {
     const urlPath = `https://www.googleapis.com/drive/v2/files${fileId}/permissions`
     const queryParam = qs.stringify(options)
     const body = JSON.stringify({
@@ -175,6 +179,20 @@ class GoogleService {
     if (result.ok) return
     else throw new Error('Could not remove permission')
 
+  }
+
+  static async getPermissionFromFile (auth: OAuthBearer, fileId: string):
+    Promise<DriveFilePermission[]> {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`
+    const query = {
+      fields: 'permissions(role,emailAddress)'
+    }
+
+    const result = await this.authFetch(`${url}?${qs.stringify(query)}`, auth.token)
+    const data = await result.json()
+
+    if (result.ok) return data.permissions
+    else throw new Error(data)
   }
 
   /**
@@ -211,4 +229,4 @@ class GoogleService {
   }
 }
 
-export default new GoogleService()
+export default GoogleService

@@ -2,11 +2,15 @@
 import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
 import TeamService from '../services/teamService'
+import GoogleService from '../services/googleService'
 import UserService from '../services/userService'
+import PositionService from '../services/positionService'
+import RawService from '../services/rawDatabaseService'
 import * as TeamPresentation from '../presentations/teamPresentation'
 import Team, { File } from '../models/team'
 import User from '../models/user'
-import { FilePermission } from '../types'
+import { FilePermission, OAuthBearer, PositionLevel } from '../types'
+import GoogleAuthentication from '../models/authentication'
 
 export default class UserController {
   /**
@@ -61,9 +65,7 @@ export default class UserController {
     const user: User = req.context.user
 
     try {
-      await UserService.addTeamToUser(team, user)
-      await TeamService.addUserToTeam(user, team)
-
+      await PositionService.createPosition(user, team, PositionLevel.member)
       res.json({message: 'done'})
     } catch (e) {
       return next(e)
@@ -75,11 +77,11 @@ export default class UserController {
    *
    * @apiParam {String} teamId Should be the valid mongodb team id
    * @apiParam {String} fileId Should be the file id from google drive
-   * @apiParam {String} permission Can be either 'read' or 'write'
+   * @apiParam {String} permission Can be either 'reader' or 'writer'
    *
    * @apiParamExample {JSON} Request-Example:
     {
-      permission: "read"
+      permission: "reader"
     }
    */
   public static async addFileToTeam (req: Request, res: Response, next: NextFunction) {
@@ -89,21 +91,41 @@ export default class UserController {
     const fileId: string = req.params.fileId
 
     if (!(permission in FilePermission)) {
-      next(Boom.badRequest('Permission must be either "read" or "write"'))
-      return
+      return next(Boom.badRequest('Permission must be either "reader" or "writer"'))
     }
 
+    // Transfer file to admin owner
+    try {
+      await GoogleService.giveEmailFilePermission(
+        user.googleAuth as OAuthBearer,
+        fileId,
+        'waterloop.team.manager@gmail.com',
+        FilePermission.owner
+      )
+    } catch (e) {
+      next(e)
+    }
+
+    // Add file to team files list
     try {
       const file = new File()
       file.fileId = fileId
       file.owner = user
       file.permission = (permission as FilePermission)
+      file.authentication = user.googleAuth as GoogleAuthentication
 
       team.files.push(file)
       await TeamService.save(team)
+    } catch (e) {
+      return next(e)
+    }
 
-      res.json(file)
-      return
+    // Gather information before updating user permissions
+    try {
+      const rawFiles = await RawService.getRawFileRecordsByFileId(fileId)
+      const filePermissions = await GoogleService.getPermissionFromFile(user.googleAuth as OAuthBearer, fileId)
+      const userIds = team.positions.map(pos => pos.user.id)
+
     } catch (e) {
       return next(e)
     }
@@ -131,5 +153,4 @@ export default class UserController {
     const team: Team = req.context.team
     res.json(TeamPresentation.fullTeam(team))
   }
-
 }
