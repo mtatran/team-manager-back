@@ -29,6 +29,31 @@ export interface OAuthBearerWithRefresh extends OAuthBearer {
 }
 
 export enum FilePermission {
-  read = 'read',
-  write = 'write'
+  reader = 'reader',
+  writer = 'writer',
+  owner = 'owner'
 }
+
+interface FilePermissionBaseAction {
+  user: number
+  fileId: string
+}
+
+interface FilePermissionChangeAction extends FilePermissionBaseAction {
+  action: 'change'
+  permissionId: string
+  newPermission: FilePermission
+}
+
+interface FilePermissionDeleteAction extends FilePermissionBaseAction {
+  permissionId: string
+  action: 'delete'
+}
+
+interface FilePermissionCreateAction extends FilePermissionBaseAction {
+  action: 'create'
+  newPermission: FilePermission
+}
+
+export type FilePermissionAction = FilePermissionChangeAction | FilePermissionDeleteAction |
+  FilePermissionCreateAction

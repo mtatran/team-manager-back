@@ -1,17 +1,21 @@
 import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
 
-import User, { UserPosition } from '../models/user'
-import Team from '../models/team'
+import User from '../models/user'
+import Position from '../models/position'
+import Team, { File } from '../models/team'
 import BaseModelService from './base/modelService'
-import { JwtToken, PositionLevel } from '../types'
+import { RawFile } from './rawDatabaseService'
+import { DriveFilePermission } from './googleService'
+import { JwtToken, PositionLevel, FilePermissionAction, FilePermission } from '../types'
 
 class UserService extends BaseModelService<User> {
 
   joinAllDefinition = {
     alias: 'user',
     leftJoinAndSelect: {
-      positions: 'user.positions'
+      positions: 'user.positions',
+      team: 'positions.team'
     }
   }
 
@@ -75,12 +79,24 @@ class UserService extends BaseModelService<User> {
       return this.save(user)
     }
 
-    const position = new UserPosition()
+    const position = new Position()
     position.team = team
     position.level = level
 
     user.positions.push(position)
     return this.save(user)
+  }
+
+  /**
+   * Will make sure that the user has the highest level permission afforded by
+   * the different groups that they are in
+   *
+   * @param drivePermissions Permissions that are currently in google drive
+   * @param dbPermissions Permissions currently in the database
+   * @param userIds userids that the permission change will affect
+   */
+  async getFilePermissionsForUser (users: User[]) {
+    return null
   }
 }
 
