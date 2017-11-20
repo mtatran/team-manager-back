@@ -58,6 +58,7 @@ export interface DriveListResponse {
 export interface AddPermissionOptions {
   emailMessage: string
   sendNotificationEmails: boolean
+  transferOwnership: boolean
 }
 
 class GoogleService {
@@ -148,12 +149,13 @@ class GoogleService {
    * Adds email with permission to file. If successful, returns the permission id
    */
   static async giveEmailFilePermission (auth: OAuthBearer, fileId: string, email: string, permission: FilePermission, options: Partial<AddPermissionOptions> = {}): Promise<string> {
-    const urlPath = `https://www.googleapis.com/drive/v2/files${fileId}/permissions`
+    if (permission === FilePermission.owner) options.transferOwnership = true
+    const urlPath = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`
     const queryParam = qs.stringify(options)
     const body = JSON.stringify({
       role: permission,
       type: 'user',
-      value: email
+      emailAddress: email
     })
 
     const url = `${urlPath}?${queryParam}`

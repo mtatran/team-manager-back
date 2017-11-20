@@ -9,6 +9,7 @@ import isGoogleAuthenticated from '../policies/isGoogleAuthenticated'
 import isValidTeam from '../policies/isValidTeam'
 import isValidUser from '../policies/isValidUser'
 import isValidGoogleFile from '../policies/isValidGoogleFile'
+import needsAdminCredentials from '../policies/needsAdminCredentials'
 
 const router = Router()
 
@@ -43,14 +44,16 @@ router.post('/:teamId/add', [isAuthenticated, isValidTeam, isValidUser], TeamCon
 router.get('/:teamId', [isValidTeam], TeamController.getTeam)
 
 /**
- * @api {POST} /teams/:teamId/file/:fileId Add file to team
+ * @api {POST} /teams/:teamId/file Add file to team
  * @apiName addFileToTeam
  * @apiGroup Teams
  * @apiVersion 1.0.0
  *
  * @apiUse controller_team_add_file
+ *
+ * @todo: Make sure the user is also allowed to add files to the team
  */
-router.post('/:teamId/file/:fileId', [isAuthenticated, isGoogleAuthenticated, isValidTeam, isValidGoogleFile],
+router.post('/:teamId/file', [isAuthenticated, isGoogleAuthenticated, isValidTeam, isValidGoogleFile, needsAdminCredentials],
   TeamController.addFileToTeam)
 
 /**

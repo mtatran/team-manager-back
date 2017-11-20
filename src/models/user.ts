@@ -2,7 +2,7 @@ import { Entity, Column, JoinColumn, OneToOne, OneToMany, ManyToOne } from 'type
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
 import Base from './base'
 import Team from './team'
-import Authentication from './authentication'
+import GoogleAuthentication from './googleAuthentication'
 import Position from './position'
 import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
 
@@ -28,7 +28,7 @@ export default class User extends Base {
   @IsOptional()
   @IsMobilePhone('en-CA')
   @Column({ nullable: true })
-  phoneNumber: string
+  phoneNumber?: string
 
   @IsEmail()
   @Column({ unique: true, length: 100 })
@@ -46,13 +46,12 @@ export default class User extends Base {
   @Column({ unique: true, length: 50, default: null, nullable: true })
   slackTag?: string
 
-  @OneToOne(type => Authentication, {
+  @OneToOne(type => GoogleAuthentication, ga => ga.user, {
     nullable: true,
     eager: true,
     cascadeAll: true
   })
-  @JoinColumn()
-  googleAuth?: Authentication
+  googleAuth?: GoogleAuthentication
 
   @OneToMany(type => Position, pos => pos.user, {
     cascadeInsert: true,

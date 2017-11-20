@@ -10,7 +10,7 @@ import * as TeamPresentation from '../presentations/teamPresentation'
 import Team, { File } from '../models/team'
 import User from '../models/user'
 import { FilePermission, OAuthBearer, PositionLevel } from '../types'
-import GoogleAuthentication from '../models/authentication'
+import GoogleAuthentication from '../models/googleAuthentication'
 
 export default class UserController {
   /**
@@ -87,8 +87,8 @@ export default class UserController {
   public static async addFileToTeam (req: Request, res: Response, next: NextFunction) {
     let team: Team = req.context.team
     let user: User = req.user
-    const permission: string = req.body.permission
-    const fileId: string = req.params.fileId
+    const permission: FilePermission = req.body.permission
+    const fileId: string = req.context.file.id
 
     if (!(permission in FilePermission)) {
       return next(Boom.badRequest('Permission must be either "reader" or "writer"'))
@@ -99,11 +99,11 @@ export default class UserController {
       await GoogleService.giveEmailFilePermission(
         user.googleAuth as OAuthBearer,
         fileId,
-        'waterloop.team.manager@gmail.com',
+        req.context.admin.email,
         FilePermission.owner
       )
     } catch (e) {
-      next(e)
+      return next(e)
     }
 
     // Add file to team files list
@@ -112,7 +112,6 @@ export default class UserController {
       file.fileId = fileId
       file.owner = user
       file.permission = (permission as FilePermission)
-      file.authentication = user.googleAuth as GoogleAuthentication
 
       team.files.push(file)
       await TeamService.save(team)
@@ -122,13 +121,22 @@ export default class UserController {
 
     // Gather information before updating user permissions
     try {
-      const rawFiles = await RawService.getRawFileRecordsByFileId(fileId)
-      const filePermissions = await GoogleService.getPermissionFromFile(user.googleAuth as OAuthBearer, fileId)
-      const userIds = team.positions.map(pos => pos.user.id)
+      const promises = team.positions.map(pos => (
+        GoogleService.giveEmailFilePermission(
+          req.context.admin.googleAuth as OAuthBearer,
+          fileId,
+          pos.user.email,
+          permission,
+          { emailMessage: `A new file has been added to the Waterloop team: ${team.name}` }
+        )
+      ))
 
+      await Promise.all(promises)
     } catch (e) {
       return next(e)
     }
+
+    res.json({ message: 'done' })
   }
 
   /**

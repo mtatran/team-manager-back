@@ -4,7 +4,7 @@ import GoogleService from '../services/googleService'
 import { OAuthBearer } from '../types'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
-  const fileId: string = req.params.fileId
+  const fileId: string = req.body.fileId
   const user: User = req.user
 
   try {

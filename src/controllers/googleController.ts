@@ -4,11 +4,11 @@ import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import UserService from '../services/userService'
 import User from '../models/user'
-import Authentication from '../models/authentication'
+import GoogleAuthentication from '../models/googleAuthentication'
 import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
 
 interface AuthedUser extends User {
-  googleAuth: Authentication
+  googleAuth: GoogleAuthentication
 }
 
 class GoogleController {
@@ -33,7 +33,12 @@ class GoogleController {
       return next(Boom.conflict('Do not need to reauthenticate to google'))
     }
 
-    user.googleAuth = (bearer as Authentication)
+    const googleAuth = new GoogleAuthentication()
+    googleAuth.token = bearer.token
+    googleAuth.refreshToken = bearer.refreshToken
+    googleAuth.tokenExpireDate = bearer.tokenExpireDate
+
+    user.googleAuth = googleAuth
     await UserService.save(user)
     /**
      * @todo should redirect page to a react page
