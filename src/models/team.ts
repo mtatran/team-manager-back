@@ -5,7 +5,6 @@ import { DriveFile } from '../services/googleService'
 import Base from './base'
 import User from './user'
 import Position from './position'
-import Authentication from './authentication'
 
 @Entity()
 export default class Team extends Base {
@@ -37,10 +36,6 @@ export class File extends Base {
 
   @Column('enum', { enum: FilePermission })
   permission: FilePermission
-
-  @OneToOne(type => Authentication, { eager: true })
-  @JoinColumn()
-  authentication: Authentication
 
   @ManyToOne(type => Team, team => team.files)
   team: Team

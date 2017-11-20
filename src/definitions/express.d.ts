@@ -1,5 +1,5 @@
 declare module Express {
   export interface Request {
-    context?: any
+    context: any
   }
 }

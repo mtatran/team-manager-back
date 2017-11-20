@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm'
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm'
 import Base from './base'
+import User from './user'
 import { OAuthBearerWithRefresh } from '../types'
 
 @Entity()
@@ -12,4 +13,8 @@ export default class GoogleAuthentication extends Base implements OAuthBearerWit
 
   @Column()
   tokenExpireDate: Date
+
+  @OneToOne(type => User, user => user.googleAuth)
+  @JoinColumn()
+  user: User
 }

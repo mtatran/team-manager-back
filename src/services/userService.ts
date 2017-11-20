@@ -1,6 +1,5 @@
 import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
-
 import User from '../models/user'
 import Position from '../models/position'
 import Team, { File } from '../models/team'
