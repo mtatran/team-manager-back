@@ -7,6 +7,7 @@
 
 import * as qs from 'qs'
 import fetch, { RequestInit, Response } from 'node-fetch'
+import User from '../models/user'
 import { OAuthBearer, OAuthBearerWithRefresh, FilePermission } from '../types'
 const googleConfig = require('../../client_id.json')
 

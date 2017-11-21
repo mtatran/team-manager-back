@@ -1,13 +1,16 @@
 
 import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
+import * as _ from 'lodash'
 import TeamService from '../services/teamService'
 import GoogleService from '../services/googleService'
 import UserService from '../services/userService'
 import PositionService from '../services/positionService'
+import FileService from '../services/fileService'
 import RawService from '../services/rawDatabaseService'
 import * as TeamPresentation from '../presentations/teamPresentation'
-import Team, { File } from '../models/team'
+import Team from '../models/team'
+import File from '../models/file'
 import User from '../models/user'
 import { FilePermission, OAuthBearer, PositionLevel } from '../types'
 import GoogleAuthentication from '../models/googleAuthentication'
@@ -135,7 +138,6 @@ export default class UserController {
     } catch (e) {
       return next(e)
     }
-
     res.json({ message: 'done' })
   }
 
@@ -160,5 +162,24 @@ export default class UserController {
   public static async getTeam (req: Request, res: Response, next: NextFunction) {
     const team: Team = req.context.team
     res.json(TeamPresentation.fullTeam(team))
+  }
+
+  /**
+   * Permissions might need to be recalculated for each time a team changes. If the user
+   * is granted permissions from another team, we don't want to accidentally overwrite
+   * their permissions or send them an annoying email
+   */
+  private static async getFilePermissionChanges (users: User[], fileId: string, auth: OAuthBearer) {
+    const driveFilePermissions = await GoogleService.getPermissionFromFile(auth, fileId)
+
+    const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
+    const uniqueTeamIds = _.union(...teamIds)
+
+    const teamFilePermissions = FileService.findMany({ where: { team: uniqueTeamIds, fileId } })
+
+    const changeActionArray = []
+
+    users.forEach(user => {
+    })
   }
 }
