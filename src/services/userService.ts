@@ -2,7 +2,8 @@ import { hash, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken'
 import User from '../models/user'
 import Position from '../models/position'
-import Team, { File } from '../models/team'
+import Team from '../models/team'
+import File from '../models/file'
 import BaseModelService from './base/modelService'
 import { RawFile } from './rawDatabaseService'
 import { DriveFilePermission } from './googleService'
@@ -18,9 +19,7 @@ class UserService extends BaseModelService<User> {
     }
   }
 
-  constructor () {
-    super(User)
-  }
+  constructor () { super(User) }
 
   /**
    * Create a user object, use at first instead of save so that
@@ -92,7 +91,7 @@ class UserService extends BaseModelService<User> {
    *
    * @param drivePermissions Permissions that are currently in google drive
    * @param dbPermissions Permissions currently in the database
-   * @param userIds userids that the permission change will affect
+   * @param users array of user models
    */
   async getFilePermissionsForUser (users: User[]) {
     return null

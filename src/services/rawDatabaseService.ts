@@ -1,5 +1,5 @@
 import { getConnection } from 'typeorm'
-import { File } from '../models/team'
+import File from '../models/file'
 import { FilePermission } from '../types'
 
 export interface RawFile {
