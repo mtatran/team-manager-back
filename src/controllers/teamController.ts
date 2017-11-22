@@ -171,15 +171,44 @@ export default class UserController {
    */
   private static async getFilePermissionChanges (users: User[], fileId: string, auth: OAuthBearer) {
     const driveFilePermissions = await GoogleService.getPermissionFromFile(auth, fileId)
+    const drivePermissionMap = driveFilePermissions.reduce(
+      (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr.role}),
+      {}
+    )
 
     const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
     const uniqueTeamIds = _.union(...teamIds)
 
-    const teamFilePermissions = FileService.findMany({ where: { team: uniqueTeamIds, fileId } })
+    const teamFilePermissions = await FileService.findMany({ where: { team: uniqueTeamIds, fileId } })
 
     const changeActionArray = []
 
     users.forEach(user => {
+      const userTeamIds = user.positions.map(pos => pos.teamId)
+      const applicablePermissions = teamFilePermissions
+        .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
+        .map(file => file.permission)
+
+      const changeAction = this.getChangeAction(drivePermissionMap[user.email.toLowerCase()], applicablePermissions)
     })
   }
+
+  private static getChangeAction (current: FilePermission, all: FilePermission[]) {
+    const maxGranted = all.reduce(
+      (prev, curr) => this.maxPermission(prev, curr),
+      null
+    )
+  }
+
+  private static maxPermission (a: FilePermission, b: FilePermission) {
+    let rankings = {
+      [FilePermission.none]: 0,
+      [FilePermission.reader]: 1,
+      [FilePermission.writer]: 2,
+      [FilePermission.owner]: 3
+    }
+
+    return rankings[a] > rankings[b] ? a : b
+  }
+
 }
