@@ -29,9 +29,10 @@ export interface OAuthBearerWithRefresh extends OAuthBearer {
 }
 
 export enum FilePermission {
-  reader = 'reader',
-  writer = 'writer',
-  owner = 'owner'
+  none,
+  reader,
+  writer,
+  owner
 }
 
 interface FilePermissionBaseAction {

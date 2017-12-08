@@ -195,20 +195,8 @@ export default class UserController {
 
   private static getChangeAction (current: FilePermission, all: FilePermission[]) {
     const maxGranted = all.reduce(
-      (prev, curr) => this.maxPermission(prev, curr),
-      null
+      (prev, curr) => Math.max(prev, curr),
+      FilePermission.none
     )
   }
-
-  private static maxPermission (a: FilePermission, b: FilePermission) {
-    let rankings = {
-      [FilePermission.none]: 0,
-      [FilePermission.reader]: 1,
-      [FilePermission.writer]: 2,
-      [FilePermission.owner]: 3
-    }
-
-    return rankings[a] > rankings[b] ? a : b
-  }
-
 }
