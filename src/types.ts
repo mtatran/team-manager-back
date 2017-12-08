@@ -1,4 +1,3 @@
-import { ObjectID } from 'typeorm'
 
 export enum Authority {
   member = 'member',

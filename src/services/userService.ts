@@ -3,11 +3,8 @@ import { sign } from 'jsonwebtoken'
 import User from '../models/user'
 import Position from '../models/position'
 import Team from '../models/team'
-import File from '../models/file'
 import BaseModelService from './base/modelService'
-import { RawFile } from './rawDatabaseService'
-import { DriveFilePermission } from './googleService'
-import { JwtToken, PositionLevel, FilePermissionAction, FilePermission } from '../types'
+import { JwtToken, PositionLevel } from '../types'
 
 class UserService extends BaseModelService<User> {
 

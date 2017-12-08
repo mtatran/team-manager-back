@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
 import UserService from '../services/userService'
-import TeamService from '../services/teamService'
 
 export default async (req: Request, res: Response, next: NextFunction) => {
   let userId = req.params.userId || req.body.userId || req.query.userId

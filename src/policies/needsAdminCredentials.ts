@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
 import UserService from '../services/userService'
-import TeamService from '../services/teamService'
 import GoogleService from '../services/googleService'
 import { Authority, OAuthBearer } from '../types'
 

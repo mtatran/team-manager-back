@@ -1,10 +1,9 @@
-import { Entity, Column, OneToOne, ManyToOne, OneToMany, JoinColumn, RelationId } from 'typeorm'
-import { PositionLevel, FilePermission } from '../types'
+import { Entity, Column, OneToOne, ManyToOne, JoinColumn, RelationId } from 'typeorm'
+import { FilePermission } from '../types'
 import { DriveFile } from '../services/googleService'
 import Base from './base'
 import User from './user'
 import Team from './team'
-import Position from './position'
 
 @Entity()
 export default class File extends Base {
