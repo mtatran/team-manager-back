@@ -1,10 +1,9 @@
-import { Entity, Column, JoinColumn, OneToOne, OneToMany, ManyToOne } from 'typeorm'
+import { Entity, Column, OneToOne, OneToMany } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
 import Base from './base'
-import Team from './team'
 import GoogleAuthentication from './googleAuthentication'
 import Position from './position'
-import { Authority, PositionLevel, OAuthBearerWithRefresh } from '../types'
+import { Authority } from '../types'
 
 @Entity()
 export default class User extends Base {

@@ -1,6 +1,5 @@
 import { Application, Request, Response, NextFunction } from 'express'
 import * as passport from 'passport'
-import * as Boom from 'boom'
 import User from '../models/user'
 import UserService from '../services/userService'
 

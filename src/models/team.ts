@@ -1,9 +1,6 @@
-import { Entity, Column, OneToOne, ManyToOne, OneToMany, JoinColumn } from 'typeorm'
+import { Entity, Column, OneToMany } from 'typeorm'
 import { IsAlphanumeric } from 'class-validator'
-import { PositionLevel, FilePermission } from '../types'
-import { DriveFile } from '../services/googleService'
 import Base from './base'
-import User from './user'
 import File from './file'
 import Position from './position'
 

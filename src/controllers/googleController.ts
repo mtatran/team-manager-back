@@ -5,7 +5,7 @@ import { listResponse } from '../presentations/googlePresentation'
 import UserService from '../services/userService'
 import User from '../models/user'
 import GoogleAuthentication from '../models/googleAuthentication'
-import { OAuthBearer, OAuthBearerWithRefresh } from '../types'
+import { OAuthBearer } from '../types'
 
 interface AuthedUser extends User {
   googleAuth: GoogleAuthentication

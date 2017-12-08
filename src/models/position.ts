@@ -1,4 +1,4 @@
-import { Entity, Column, JoinColumn, OneToOne, OneToMany, ManyToOne, RelationId } from 'typeorm'
+import { Entity, Column, JoinColumn, ManyToOne, RelationId } from 'typeorm'
 import User from './user'
 import Team from './team'
 import Base from './base'
