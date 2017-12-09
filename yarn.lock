@@ -499,7 +499,11 @@ chokidar@^1.7.0:
   optionalDependencies:
     fsevents "^1.0.0"
 
-class-validator@^0.7.3:
+class-transformer@~0.1.6:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/class-transformer/-/class-transformer-0.1.8.tgz#be04dd2afb7b301e4c8c79c5349fedaac3d5a7e1"
+
+class-validator@^0.7.0, class-validator@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/class-validator/-/class-validator-0.7.3.tgz#3c2821b8cf35fd8d5f4fcb8063bc57fb50049e7e"
   dependencies:
@@ -597,7 +601,7 @@ cookie-signature@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
 
-cookie@0.3.1:
+cookie@0.3.1, cookie@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
@@ -2380,6 +2384,17 @@ rimraf@~2.4.0:
   dependencies:
     glob "^6.0.1"
 
+routing-controllers@^0.7.6:
+  version "0.7.6"
+  resolved "https://registry.yarnpkg.com/routing-controllers/-/routing-controllers-0.7.6.tgz#f025b6b1f011fb5973e94db4ffde86da8d48091e"
+  dependencies:
+    class-transformer "~0.1.6"
+    class-validator "^0.7.0"
+    cookie "^0.3.1"
+    glob "^7.0.5"
+    reflect-metadata "^0.1.10"
+    template-url "^1.0.0"
+
 safe-buffer@5.1.1, safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
@@ -2638,6 +2653,10 @@ tar@^2.2.1:
     block-stream "*"
     fstream "^1.0.2"
     inherits "2"
+
+template-url@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/template-url/-/template-url-1.0.0.tgz#d9456bee70cac6617b462a7b08db29fb813a0b09"
 
 term-size@^1.2.0:
   version "1.2.0"
