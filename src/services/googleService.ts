@@ -7,7 +7,7 @@
 
 import * as qs from 'qs'
 import fetch, { RequestInit, Response } from 'node-fetch'
-import { OAuthBearer, FilePermission } from '../types'
+import { OAuthBearer, FilePermission, FilePermissionAction } from '../types'
 const googleConfig = require('../../client_id.json')
 
 export interface TokenResponse {
@@ -47,6 +47,7 @@ export interface DriveFile {
 export interface DriveFilePermission {
   role: FilePermission
   emailAddress: string
+  id: string
 }
 
 export interface DriveListResponse {
@@ -175,9 +176,7 @@ class GoogleService {
    */
   static async removePermissionFromFile (auth: OAuthBearer, fileId: string, permissionId: string) {
     const urlPath = `https://www.googleapis.com/drive/v2/files${fileId}/permissions/${permissionId}`
-
     const result = await this.authFetch(urlPath, auth.token, { method: 'DELETE' })
-
     if (result.ok) return
     else throw new Error('Could not remove permission')
 
@@ -187,14 +186,56 @@ class GoogleService {
     Promise<DriveFilePermission[]> {
     const url = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions`
     const query = {
-      fields: 'permissions(role,emailAddress)'
+      fields: 'permissions(role,emailAddress,id)'
     }
 
     const result = await this.authFetch(`${url}?${qs.stringify(query)}`, auth.token)
     const data = await result.json()
 
-    if (result.ok) return data.permissions
-    else throw new Error(data)
+    if (result.ok) {
+      return data.permissions.map((permission: any) => ({
+        ...permission,
+        role: FilePermission[permission.role]
+      }))
+    } else throw new Error(data)
+  }
+
+  static async updatePermissionForFile (auth: OAuthBearer, fileId: string, permissionId: string, permission: FilePermission) {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions/${permissionId}`
+    const body = {
+      role: this.filePermissionToText(permission)
+    }
+
+    const result = await this.authFetch(url, auth.token, {
+      method: 'PATCH',
+      body: JSON.stringify(body)
+    })
+
+    if (result.ok) return null
+    else throw new Error(await result.text())
+  }
+
+  static saveFilePermissionActions (auth: OAuthBearer, actions: FilePermissionAction[]) {
+    let permissionPromises = actions.map(action => {
+      if (action.action === 'create') {
+        return this.giveEmailFilePermission(auth, action.fileId, action.email, action.newPermission)
+      } else if (action.action === 'delete') {
+        return this.removePermissionFromFile(auth, action.fileId, action.permissionId)
+      } else if (action.action === 'change') {
+        return this.updatePermissionForFile(auth, action.fileId, action.permissionId, action.newPermission)
+      } else return Promise.resolve()
+    })
+
+    return Promise.all(permissionPromises as any)
+  }
+
+  private static async filePermissionToText (permission: FilePermission) {
+    switch (permission) {
+      case FilePermission.owner: return 'owner'
+      case FilePermission.reader: return 'reader'
+      case FilePermission.writer: return 'writer'
+      default: return 'none'
+    }
   }
 
   /**

@@ -35,7 +35,6 @@ export enum FilePermission {
 }
 
 interface FilePermissionBaseAction {
-  user: number
   fileId: string
 }
 
@@ -53,6 +52,8 @@ interface FilePermissionDeleteAction extends FilePermissionBaseAction {
 interface FilePermissionCreateAction extends FilePermissionBaseAction {
   action: 'create'
   newPermission: FilePermission
+  email: string
+  message?: string
 }
 
 export type FilePermissionAction = FilePermissionChangeAction | FilePermissionDeleteAction |

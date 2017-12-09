@@ -3,14 +3,15 @@ import { Request, Response, NextFunction } from 'express'
 import * as Boom from 'boom'
 import * as _ from 'lodash'
 import TeamService from '../services/teamService'
-import GoogleService from '../services/googleService'
+import UserService from '../services/userService'
+import GoogleService, { DriveFilePermission } from '../services/googleService'
 import PositionService from '../services/positionService'
 import FileService from '../services/fileService'
 import * as TeamPresentation from '../presentations/teamPresentation'
 import Team from '../models/team'
 import File from '../models/file'
 import User from '../models/user'
-import { FilePermission, OAuthBearer, PositionLevel } from '../types'
+import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction } from '../types'
 
 export default class UserController {
   /**
@@ -102,12 +103,7 @@ export default class UserController {
         req.context.admin.email,
         FilePermission.owner
       )
-    } catch (e) {
-      return next(e)
-    }
 
-    // Add file to team files list
-    try {
       const file = new File()
       file.fileId = fileId
       file.owner = user
@@ -115,12 +111,7 @@ export default class UserController {
 
       team.files.push(file)
       await TeamService.save(team)
-    } catch (e) {
-      return next(e)
-    }
 
-    // Gather information before updating user permissions
-    try {
       const promises = team.positions.map(pos => (
         GoogleService.giveEmailFilePermission(
           req.context.admin.googleAuth as OAuthBearer,
@@ -147,10 +138,14 @@ export default class UserController {
   public static async removeFileFromTeam (req: Request, res: Response, next: NextFunction) {
     let team: Team = req.context.team
     const fileId: string = req.params.fileId
-
     team.files = team.files.filter(file => file.fileId === fileId)
     try {
       await TeamService.save(team)
+      const userIds = team.positions.map(v => v.userId)
+      const users = await UserService.findMany({ where: { id: userIds }}, { includeAll: true })
+
+      const changes = await this.getFilePermissionChanges(users, fileId, req.context.admin.googleAuth)
+      await GoogleService.saveFilePermissionActions(req.context.admin.googleAuth, changes)
     } catch (e) {
       return next(e)
     }
@@ -168,15 +163,15 @@ export default class UserController {
    */
   private static async getFilePermissionChanges (users: User[], fileId: string, auth: OAuthBearer) {
     const driveFilePermissions = await GoogleService.getPermissionFromFile(auth, fileId)
-    const drivePermissionMap = driveFilePermissions.reduce(
-      (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr.role}),
+    const drivePermissionMap: {[key: string]: DriveFilePermission} = driveFilePermissions.reduce(
+      (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr}),
       {}
     )
 
     const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
     const uniqueTeamIds = _.union(...teamIds)
     const teamFilePermissions = await FileService.findMany({ where: { team: uniqueTeamIds, fileId } })
-    const changeActionArray = []
+    const changeActionArray: FilePermissionAction[] = []
 
     users.forEach(user => {
       const userTeamIds = user.positions.map(pos => pos.teamId)
@@ -184,14 +179,23 @@ export default class UserController {
         .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
         .map(file => file.permission)
 
-      const changeAction = this.getChangeAction(drivePermissionMap[user.email.toLowerCase()], applicablePermissions)
+      const currentPermission = drivePermissionMap[user.email.toLowerCase()]
+      const maxGivenPermission = this.getMaxPermission(applicablePermissions)
+
+      if (maxGivenPermission === currentPermission.role) return
+      if (maxGivenPermission === FilePermission.none) {
+        changeActionArray.push({ action: 'delete', permissionId: currentPermission.id, fileId })
+      } else if (currentPermission.role === FilePermission.none) {
+        changeActionArray.push({ action: 'create', newPermission: maxGivenPermission, email: user.email, fileId})
+      } else {
+        changeActionArray.push({ action: 'change', newPermission: maxGivenPermission, fileId, permissionId: currentPermission.id })
+      }
     })
+
+    return changeActionArray
   }
 
-  private static getChangeAction (current: FilePermission, all: FilePermission[]) {
-    const maxGranted = all.reduce(
-      (prev, curr) => Math.max(prev, curr),
-      FilePermission.none
-    )
+  private static getMaxPermission (permissions: FilePermission[]) {
+    return permissions.reduce((pre, curr) => Math.max(pre, curr), FilePermission.none)
   }
 }

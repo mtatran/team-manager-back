@@ -9,17 +9,6 @@ import JWTStrategy from './jwtStrategy'
 
 passport.use(LocalStrategy)
 passport.use(JWTStrategy)
-passport.serializeUser((user: User, done) => done(null, user.id.toString()))
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const user = await UserService.findOneById(id)
-    if (user) return done(null, user)
-
-    throw new Error('User not found')
-  } catch (e) {
-    done(e)
-  }
-})
 
 export default (app: Application) => {
   app.use(passport.initialize())
