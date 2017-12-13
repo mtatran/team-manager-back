@@ -1,5 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
-import * as Boom from 'boom'
+import { JsonController, Redirect, Get, CurrentUser, Authorized, Param, BadRequestError } from 'routing-controllers'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import UserService from '../services/userService'
@@ -11,26 +10,44 @@ interface AuthedUser extends User {
   googleAuth: GoogleAuthentication
 }
 
-class GoogleController {
+@JsonController('/google')
+export default class GoogleController {
   /**
-   * Redirects the user to the appropriate link for authorization
+   * Redirects to google OAuth2 authentication link
+   *
+   * @api {GET} /google/redirect Google OAuth2 Redirect
+   * @apiName googleOAuth
+   * @apiGroup google
+   * @apiVersion  1.0.0
    */
-  redirectToGoogle = (req: Request, res: Response) => {
+  @Get('/redirect')
+  @Redirect('useless-string') // Need to not be an empty string
+  redirectToGoogle () {
     let authUrl = GoogleService.getAuthUrl()
-
-    res.redirect(authUrl)
+    return authUrl
   }
-
-  googleCallBack = async (req: Request, res: Response, next: NextFunction) => {
-    const user: User = req.user
-    const {error, code} = req.query
-
-    if ( error ) return next(Boom.boomify(error))
+  /**
+   * Callback that google redirects to so that the server can get the
+   * authentication token
+   *
+   * @api {GET} /google/callback Google OAuth2 Callback
+   * @apiName googleOAuthCallback
+   * @apiGroup google
+   * @apiVersion  1.0.0
+   */
+  @Get('/callback')
+  @Authorized()
+  async googleCallBack (
+    @CurrentUser() user: User,
+    @Param('error') error: string,
+    @Param('code') code: string
+  ) {
+    if ( error ) throw new BadRequestError(error)
 
     const bearer = await GoogleService.onAuthSuccess(code)
 
     if (user.googleAuth && user.googleAuth.refreshToken && !bearer.refreshToken) {
-      return next(Boom.conflict('Do not need to reauthenticate to google'))
+      throw new BadRequestError('Do not need to reauthenticate to google')
     }
 
     const googleAuth = new GoogleAuthentication()
@@ -43,53 +60,48 @@ class GoogleController {
     /**
      * @todo should redirect page to a react page
      */
-    return res.send('login success')
-  }
-
-  isAuthenticated = (req: Request, res: Response) => {
-    const user: User = req.user
-    const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
-
-    res.json({ authenticated: isAuthed })
+    return null
   }
 
   /**
-   * @apiDefine controller_google_get_files
+   * @api {GET} /google/isAuthenticated Google OAuth2 Check
+   * @apiName googleOAuthCheck
+   * @apiGroup google
+   * @apiVersion 1.0.0
+   *
+   * @apiSuccess {boolean} authenticated
+  */
+  @Get('/isAuthenticated')
+  isAuthenticated (@CurrentUser() user: User) {
+    const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
+    return { authenticated: isAuthed }
+  }
+
+  /**
+   * @api {GET} /google/files Get drive files
+   * @apiName googleGetFiles
+   * @apiGroup google
+   * @apiVersion  1.0.0
+   *
+   * @apiUse success_google_list_response
    *
    * @apiParam {Integer} [pageSize] Maximum documents responded
    * @apiParam {string} [q] Search Query
    * @apiParam {Integer} [pageToken] Page token for requesting a certain page
    */
-  getFiles = async (req: Request, res: Response, next: NextFunction) => {
-    const user: AuthedUser = req.user
-    try {
-      const options: DriveListOptions = {
-        pageSize: req.query.pageSize || 50,
-        q: req.query.q,
-        pageToken: req.query.pageToken
-      }
-
-      const results = await GoogleService.getListOfFiles(user.googleAuth as OAuthBearer, options)
-      res.json(listResponse(results))
-    } catch (e) {
-      next(e)
+  async getFiles (
+    @CurrentUser() user: AuthedUser,
+    @Param('pageSize') pageSize: string = '50',
+    @Param('q') q: string,
+    @Param('pageToken') pageToken: string
+  ) {
+    const options: DriveListOptions = {
+      pageSize: parseInt(pageSize, 10),
+      q,
+      pageToken
     }
+
+    const results = await GoogleService.getListOfFiles(user.googleAuth as OAuthBearer, options)
+    return listResponse(results)
   }
-
-  /**
-   * Makes sure the user has the permissions to perform a google drive action
-   * Will refresh tokens if needed and will throw an error if the user
-   * has never authenticated to google before
-   */
-  // private async prepareUserAuthentication (user: AuthedUser): Promise<void> {
-  //   if (GoogleService.isAuthenticated(user.googleAuth)) return
-
-  //   const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)
-
-  //   user.googleAuth.token = newBearer.token
-  //   user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
-  //   await UserService.save(user)
-  // }
 }
-
-export default new GoogleController()
