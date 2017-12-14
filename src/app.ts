@@ -3,10 +3,10 @@ import { Request, Response, NextFunction } from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import * as Boom from 'boom'
+import * as path from 'path'
+import { useExpressServer } from 'routing-controllers'
 
 import initializeAuthentication from './authentication'
-import api from './api'
-import log from './utils/log'
 
 const app: express.Express = express()
 
@@ -15,20 +15,10 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 initializeAuthentication(app)
 
-app.use((req, res, next) => {
-  req.context = req.context || {}
-  next()
-})
-
-app.use('/api', api)
-
-/**
- * Route for catching boom errors
- */
-app.use((err: Boom.BoomError, req: Request, res: Response, next: NextFunction) => {
-  log.error(err)
-  const statusCode = (err.isBoom && err.output.statusCode) || 500
-  res.status(statusCode).json({ error: err.message })
+useExpressServer(app, {
+  routePrefix: '/api',
+  controllers: [path.join(__dirname, 'controllers', '*')],
+  currentUserChecker: action => action.request.user
 })
 
 export default app

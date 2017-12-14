@@ -4,7 +4,8 @@ import User from '../models/user'
 import Position from '../models/position'
 import Team from '../models/team'
 import BaseModelService from './base/modelService'
-import { JwtToken, PositionLevel } from '../types'
+import { JwtToken, PositionLevel, Authority } from '../types'
+import { getConnection } from 'typeorm'
 
 class UserService extends BaseModelService<User> {
 
@@ -80,6 +81,20 @@ class UserService extends BaseModelService<User> {
 
     user.positions.push(position)
     return this.save(user)
+  }
+
+  async getAdminUser () {
+    const admin = await this.findOne({
+      where: { authority: Authority.admin },
+      cache: { milliseconds: 6000000, id: 'admin_user' }  // Cache the admin user
+    })
+    if (!admin) throw new Error('No admin user exists')
+    return admin
+  }
+
+  async removeAdminCache () {
+    const queryResultCache = getConnection().queryResultCache
+    if (queryResultCache) queryResultCache.remove(['admin_user'])
   }
 
   /**
