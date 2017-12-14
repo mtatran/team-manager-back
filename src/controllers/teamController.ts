@@ -1,7 +1,7 @@
 
-import { Request, Response, NextFunction } from 'express'
-import * as Boom from 'boom'
+import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, BodyParam, BadRequestError, NotFoundError, Delete } from 'routing-controllers'
 import * as _ from 'lodash'
+import { AdminUser } from './parameter-decorators'
 import TeamService from '../services/teamService'
 import UserService from '../services/userService'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
@@ -13,39 +13,58 @@ import File from '../models/file'
 import User from '../models/user'
 import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction } from '../types'
 
+@JsonController('/teams')
 export default class UserController {
-  /**
-   * @apiDefine controller_team_create
-   *
-   * @apiParam {String} name
-   *
-   * @apiParamExample  {JSON} Request-Example:
-     {
-        name: "frontend"
-     }
-   *
-   * @apiSuccess {String} message "Team created"
-   *
-   * @apiSuccessExample {json} Success-Response:
-     {
-      message: "team created"
-     }
-   */
-  public static async create (req: Request, res: Response, next: NextFunction) {
-    const team = new Team()
-    team.name = req.body.name
-
-    try {
-      await TeamService.save(team)
-    } catch (e) {
-      return next(e)
+/**
+  * @api {POST} /teams/create Create Team
+  * @apiName createTeam
+  * @apiGroup Teams
+  * @apiVersion  1.0.0
+  *
+  * @apiParam {String} name
+  *
+  * @apiParamExample  {JSON} Request-Example:
+    {
+      name: "frontend"
     }
+  *
+  * @apiSuccess {String} message "Team created"
+  *
+  * @apiSuccessExample {json} Success-Response:
+    {
+    message: "team created"
+     }
+  */
+  @Post('/create')
+  async create (
+    @BodyParam('name', { required: true }) name: string
+  ) {
+    const team = new Team()
+    team.name = name
 
-    res.json({message: 'team created'})
+    await TeamService.save(team)
+    return null
   }
 
   /**
-   * @apiDefine controller_team_add_user
+   * @api {GET} /teams/:teamId Get Team Info
+   * @apiName getTeam
+   * @apiGroup Teams
+   * @apiVersion  1.0.0
+   *
+   * @apiUse success_team_full
+   */
+  @Get('/:teamId')
+  async getTeam (@Param('teamId') teamId: string) {
+    return this.getTeamById(teamId)
+  }
+
+  /**
+   * @api {POST} /teams/:teamId/add Add User
+   * @apiName addUserToTeam
+   * @apiGroup Teams
+   * @apiVersion  1.0.0
+   *
    * @apiParam {Integer} userId
    *
    * @paramExample {JSON} Request-Example:
@@ -61,20 +80,23 @@ export default class UserController {
     }
    *
    */
-  public static async addUser (req: Request, res: Response, next: NextFunction) {
-    const team: Team = req.context.team
-    const user: User = req.context.user
+  @Post('/:teamId/add')
+  async addUser (
+    @Param('teamId') teamId: string,
+    @BodyParam('userId') userId: number
+  ) {
+    const team: Team = await this.getTeamById(teamId)
+    const user: User = await this.getUserById(userId)
 
-    try {
-      await PositionService.createPosition(user, team, PositionLevel.member)
-      res.json({message: 'done'})
-    } catch (e) {
-      return next(e)
-    }
+    await PositionService.createPosition(user, team, PositionLevel.member)
+    return null
   }
 
   /**
-   * @apiDefine controller_team_add_file
+   * @api {POST} /teams/:teamId/file Add file to team
+   * @apiName addFileToTeam
+   * @apiGroup Teams
+   * @apiVersion 1.0.0
    *
    * @apiParam {String} teamId Should be the valid mongodb team id
    * @apiParam {String} fileId Should be the file id from google drive
@@ -85,75 +107,77 @@ export default class UserController {
       permission: "reader"
     }
    */
-  public static async addFileToTeam (req: Request, res: Response, next: NextFunction) {
-    let team: Team = req.context.team
-    let user: User = req.user
-    const permission: FilePermission = req.body.permission
-    const fileId: string = req.context.file.id
+  @Post('/:teamId/file')
+  async addFileToTeam (
+    @CurrentUser() admin: User,
+    @AdminUser() user: User,
+    @Param('teamId') teamId: string,
+    @BodyParam('permission') permission: string,
+    @BodyParam('fileId') fileId: string
+  ) {
+    const team: Team = await this.getTeamById(teamId)
 
     if (!(permission in FilePermission)) {
-      return next(Boom.badRequest('Permission must be either "reader" or "writer"'))
+      throw new BadRequestError('Permission must be reader or writer')
     }
 
     // Transfer file to admin owner
-    try {
-      await GoogleService.giveEmailFilePermission(
+    await GoogleService.giveEmailFilePermission(
         user.googleAuth as OAuthBearer,
         fileId,
-        req.context.admin.email,
+        admin.email,
         FilePermission.owner
       )
 
-      const file = new File()
-      file.fileId = fileId
-      file.owner = user
-      file.permission = (permission as FilePermission)
+    const file = new File()
+    file.fileId = fileId
+    file.owner = user
+    file.permission = FilePermission[permission]
 
-      team.files.push(file)
-      await TeamService.save(team)
+    team.files.push(file)
+    await TeamService.save(team)
 
-      const promises = team.positions.map(pos => (
+    const promises = team.positions.map(pos => (
         GoogleService.giveEmailFilePermission(
-          req.context.admin.googleAuth as OAuthBearer,
+          admin.googleAuth as OAuthBearer,
           fileId,
           pos.user.email,
-          permission,
+          FilePermission[permission],
           { emailMessage: `A new file has been added to the Waterloop team: ${team.name}` }
         )
       ))
 
-      await Promise.all(promises)
-    } catch (e) {
-      return next(e)
-    }
-    res.json({ message: 'done' })
+    await Promise.all(promises)
+    return null
   }
 
   /**
-   * @apiDefine controller_team_remove_file
+   * @api {DELETE} /teams/:teamId/file/:fileId Add file to team
+   * @apiName addFileToTeam
+   * @apiGroup Teams
+   * @apiVersion 1.0.0
    *
    * @apiParam {String} teamId Should be the valid mongodb team id
    * @apiParam {String} fileId Should be the file id from google drive
    */
-  public static async removeFileFromTeam (req: Request, res: Response, next: NextFunction) {
-    let team: Team = req.context.team
-    const fileId: string = req.params.fileId
+  @Delete('/:teamId/file/:fileId')
+  async removeFileFromTeam (
+    @AdminUser() admin: User,
+    @Param('teamId') teamId: string,
+    @Param('fileId') fileId: string
+  ) {
+    const team = await this.getTeamById(teamId)
+
     team.files = team.files.filter(file => file.fileId === fileId)
-    try {
-      await TeamService.save(team)
-      const userIds = team.positions.map(v => v.userId)
-      const users = await UserService.findMany({ where: { id: userIds }}, { includeAll: true })
 
-      const changes = await this.getFilePermissionChanges(users, fileId, req.context.admin.googleAuth)
-      await GoogleService.saveFilePermissionActions(req.context.admin.googleAuth, changes)
-    } catch (e) {
-      return next(e)
-    }
-  }
+    await TeamService.save(team)
+    const userIds = team.positions.map(v => v.userId)
+    const users = await UserService.findMany({ where: { id: userIds }}, { includeAll: true })
 
-  public static async getTeam (req: Request, res: Response, next: NextFunction) {
-    const team: Team = req.context.team
-    res.json(TeamPresentation.fullTeam(team))
+    const googleAuth = admin.googleAuth as OAuthBearer
+
+    const changes = await this.getFilePermissionChanges(users, fileId, googleAuth)
+    await GoogleService.saveFilePermissionActions(googleAuth, changes)
   }
 
   /**
@@ -161,7 +185,7 @@ export default class UserController {
    * is granted permissions from another team, we don't want to accidentally overwrite
    * their permissions or send them an annoying email
    */
-  private static async getFilePermissionChanges (users: User[], fileId: string, auth: OAuthBearer) {
+  private async getFilePermissionChanges (users: User[], fileId: string, auth: OAuthBearer) {
     const driveFilePermissions = await GoogleService.getPermissionFromFile(auth, fileId)
     const drivePermissionMap: {[key: string]: DriveFilePermission} = driveFilePermissions.reduce(
       (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr}),
@@ -195,7 +219,21 @@ export default class UserController {
     return changeActionArray
   }
 
-  private static getMaxPermission (permissions: FilePermission[]) {
+  private getMaxPermission (permissions: FilePermission[]) {
     return permissions.reduce((pre, curr) => Math.max(pre, curr), FilePermission.none)
+  }
+
+  private async getUserById (id: string | number ) {
+    const user = await UserService.findOneById(id)
+    if (!user) throw new NotFoundError(`There is no user with id ${id}`)
+
+    return user
+  }
+
+  private async getTeamById (id: string | number ) {
+    const team = await TeamService.findOneById(id)
+    if (!team) throw new NotFoundError(`There is no team with id ${id}`)
+
+    return team
   }
 }

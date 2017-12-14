@@ -26,6 +26,7 @@ export default class GoogleController {
     let authUrl = GoogleService.getAuthUrl()
     return authUrl
   }
+
   /**
    * Callback that google redirects to so that the server can get the
    * authentication token
