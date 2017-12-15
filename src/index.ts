@@ -8,25 +8,23 @@ config()  // Import .env file
 
 function stringIsTruthy (str: String | undefined): boolean {
   let s = (str || '').toLowerCase()
-
   return s === 'true' || s === '1'
 }
 
-const connectionSettings: ConnectionOptions = {
-  url: process.env.DB_URL,
-  type: 'mariadb',
-  synchronize: stringIsTruthy(process.env.DB_SYNC),
-  logging: stringIsTruthy(process.env.DB_LOGGING),
-  entities: [path.join(__dirname, 'models/**/*')]
+async function init () {
+  const connectionSettings: ConnectionOptions = {
+    url: process.env.DB_URL,
+    type: 'mariadb',
+    synchronize: stringIsTruthy(process.env.DB_SYNC),
+    logging: stringIsTruthy(process.env.DB_LOGGING),
+    entities: [path.join(__dirname, 'models/**/*')]
+  }
+
+  await createConnection(connectionSettings)
+  const app = require('./app').default
+  const port = Number(process.env.PORT)
+
+  app.listen(port, () => log.info(`Server started and listening on port ${port}`))
 }
 
-console.log(connectionSettings)
-
-// Make connection to database
-createConnection(connectionSettings).then(() => {
-  // Start the server
-  const app = require('./app').default
-  const port: Number = Number(process.env.PORT)
-  app.listen(port, () => log.info(`Server started and listening on port ${port}`))
-})
-.catch((err) => log.error(err))
+init().catch(e => log.error(e))

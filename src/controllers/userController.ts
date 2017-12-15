@@ -1,4 +1,5 @@
 import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore } from 'routing-controllers'
+import * as bcrypt from 'bcryptjs'
 import * as passport from 'passport'
 import UserService from '../services/userService'
 import * as UserPresentation from '../presentations/userPresentation'
@@ -40,7 +41,7 @@ export default class UserController {
     user.firstName = body.firstName
     user.lastName = body.lastName
     user.phoneNumber = body.phoneNumber
-    user.password = body.password
+    user.password = await bcrypt.hash(body.password, 10)
     user.authority = Authority.member
 
     return UserService.save(user)

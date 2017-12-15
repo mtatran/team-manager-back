@@ -65,6 +65,7 @@ export default class UserController {
    * @apiGroup Teams
    * @apiVersion  1.0.0
    *
+   * @apiParam {Integer} teamId
    * @apiParam {Integer} userId
    *
    * @paramExample {JSON} Request-Example:
@@ -80,10 +81,31 @@ export default class UserController {
     }
    *
    */
-  @Post('/:teamId/add')
-  async addUser (
+  @Post('/:teamId/users')
+  async addUserToTeam (
     @Param('teamId') teamId: string,
     @BodyParam('userId') userId: number
+  ) {
+    const team: Team = await this.getTeamById(teamId)
+    const user: User = await this.getUserById(userId)
+
+    await PositionService.createPosition(user, team, PositionLevel.member)
+    return null
+  }
+
+  /**
+   * @api {DELETE} /teams/:teamId/add Remove User
+   * @apiName removeUserFromTeam
+   * @apiGroup Teams
+   * @apiVersion  1.0.0
+   *
+   * @apiParam {Integer} userId
+   * @ApiParam {Integer} teamId
+   */
+  @Delete('/:teamId/users/:userId')
+  async removeUserFromTeam (
+    @Param('teamId') teamId: string,
+    @Param('userId') userId: string
   ) {
     const team: Team = await this.getTeamById(teamId)
     const user: User = await this.getUserById(userId)

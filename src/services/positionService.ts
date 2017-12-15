@@ -31,6 +31,7 @@ class PositionService extends BaseModelService<Position> {
       await this.save(pos)
     }
   }
+
 }
 
 export default new PositionService()
