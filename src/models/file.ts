@@ -1,12 +1,12 @@
 import { Entity, Column, OneToOne, ManyToOne, JoinColumn, RelationId } from 'typeorm'
 import { FilePermission } from '../types'
 import { DriveFile } from '../services/googleService'
-import Base from './base'
-import User from './user'
-import Team from './team'
+import { Base } from './base'
+import { User } from './user'
+import { Team } from './team'
 
 @Entity()
-export default class File extends Base {
+export class File extends Base {
   @Column()
   fileId: string
 

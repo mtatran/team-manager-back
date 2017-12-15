@@ -1,4 +1,4 @@
-import PositionModel from '../models/position'
+import { Position } from '../models/position'
 import { partialTeam } from './teamPresentation'
 import { partialUser } from './userPresentation'
 
@@ -10,7 +10,7 @@ import { partialUser } from './userPresentation'
  * @apiSuccess {String} userId
  * @apiSuccess {[PartialUser](#api-Custom_types-ObjectPartialuser)} PartialUser
  */
-export const teamPosition = (position: PositionModel) => ({
+export const teamPosition = (position: Position) => ({
   level: position.level,
   user: position.user && partialUser(position.user)
 })
@@ -23,7 +23,7 @@ export const teamPosition = (position: PositionModel) => ({
  * @apiSuccess {String} userId
  * @apiSuccess {[PartialTeam](#api-Custom_types-ObjectPartialteam)} team
  */
-export const userPosition = (position: PositionModel) => ({
+export const userPosition = (position: Position) => ({
   level: position.level,
   team: position.team && partialTeam(position.team)
 })

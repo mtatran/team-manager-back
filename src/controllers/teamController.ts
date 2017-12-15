@@ -2,16 +2,17 @@
 import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, BodyParam, BadRequestError, NotFoundError, Delete } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
-import TeamService from '../services/teamService'
-import UserService from '../services/userService'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
-import PositionService from '../services/positionService'
-import FileService from '../services/fileService'
 import * as TeamPresentation from '../presentations/teamPresentation'
-import Team from '../models/team'
-import File from '../models/file'
-import User from '../models/user'
+import { Team } from '../models/team'
+import { File } from '../models/file'
+import { User } from '../models/user'
 import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction } from '../types'
+import { getCustomRepository } from 'typeorm'
+import { UserRepository } from '../repositories/userRepository'
+import { TeamRepository } from '../repositories/teamRepository'
+import { PositionRepository } from '../repositories/positionRepository'
+import { FileRepository } from '../repositories/fileRepository'
 
 @JsonController('/teams')
 export default class UserController {
@@ -36,13 +37,11 @@ export default class UserController {
      }
   */
   @Post('/create')
-  async create (
-    @BodyParam('name', { required: true }) name: string
-  ) {
+  async create ( @BodyParam('name', { required: true }) name: string) {
     const team = new Team()
     team.name = name
 
-    await TeamService.save(team)
+    await getCustomRepository(TeamRepository).save(team)
     return null
   }
 
@@ -89,7 +88,7 @@ export default class UserController {
     const team: Team = await this.getTeamById(teamId)
     const user: User = await this.getUserById(userId)
 
-    await PositionService.createPosition(user, team, PositionLevel.member)
+    await getCustomRepository(PositionRepository).createPosition(user, team, PositionLevel.member)
     return null
   }
 
@@ -110,7 +109,7 @@ export default class UserController {
     const team: Team = await this.getTeamById(teamId)
     const user: User = await this.getUserById(userId)
 
-    await PositionService.createPosition(user, team, PositionLevel.member)
+    await getCustomRepository(PositionRepository).createPosition(user, team, PositionLevel.member)
     return null
   }
 
@@ -157,7 +156,7 @@ export default class UserController {
     file.permission = FilePermission[permission]
 
     team.files.push(file)
-    await TeamService.save(team)
+    await getCustomRepository(TeamRepository).save(team)
 
     const promises = team.positions.map(pos => (
         GoogleService.giveEmailFilePermission(
@@ -189,12 +188,11 @@ export default class UserController {
     @Param('fileId') fileId: string
   ) {
     const team = await this.getTeamById(teamId)
-
     team.files = team.files.filter(file => file.fileId === fileId)
 
-    await TeamService.save(team)
+    await getCustomRepository(TeamRepository).save(team)
     const userIds = team.positions.map(v => v.userId)
-    const users = await UserService.findMany({ where: { id: userIds }}, { includeAll: true })
+    const users = await getCustomRepository(UserRepository).find({ where: { id: userIds }})
 
     const googleAuth = admin.googleAuth as OAuthBearer
 
@@ -216,7 +214,7 @@ export default class UserController {
 
     const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
     const uniqueTeamIds = _.union(...teamIds)
-    const teamFilePermissions = await FileService.findMany({ where: { team: uniqueTeamIds, fileId } })
+    const teamFilePermissions = await getCustomRepository(FileRepository).find({ where: { team: uniqueTeamIds, fileId } })
     const changeActionArray: FilePermissionAction[] = []
 
     users.forEach(user => {
@@ -246,14 +244,14 @@ export default class UserController {
   }
 
   private async getUserById (id: string | number ) {
-    const user = await UserService.findOneById(id)
+    const user = await getCustomRepository(UserRepository).findOneById(id)
     if (!user) throw new NotFoundError(`There is no user with id ${id}`)
 
     return user
   }
 
   private async getTeamById (id: string | number ) {
-    const team = await TeamService.findOneById(id)
+    const team = await getCustomRepository(TeamRepository).findOneById(id)
     if (!team) throw new NotFoundError(`There is no team with id ${id}`)
 
     return team

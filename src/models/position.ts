@@ -1,11 +1,11 @@
 import { Entity, Column, JoinColumn, ManyToOne, RelationId } from 'typeorm'
-import User from './user'
-import Team from './team'
-import Base from './base'
+import { User } from './user'
+import { Team } from './team'
+import { Base } from './base'
 import { PositionLevel } from '../types'
 
 @Entity()
-export default class Position extends Base {
+export class Position extends Base {
   @Column('enum', { enum: PositionLevel })
   level: PositionLevel
 

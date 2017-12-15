@@ -1,10 +1,11 @@
 import { JsonController, Redirect, Get, CurrentUser, Authorized, Param, BadRequestError } from 'routing-controllers'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
-import UserService from '../services/userService'
-import User from '../models/user'
-import GoogleAuthentication from '../models/googleAuthentication'
+import { User } from '../models/user'
+import { GoogleAuthentication } from '../models/googleAuthentication'
 import { OAuthBearer } from '../types'
+import { getCustomRepository } from 'typeorm'
+import { UserRepository } from '../repositories/userRepository'
 
 interface AuthedUser extends User {
   googleAuth: GoogleAuthentication
@@ -57,7 +58,7 @@ export default class GoogleController {
     googleAuth.tokenExpireDate = bearer.tokenExpireDate
 
     user.googleAuth = googleAuth
-    await UserService.save(user)
+    await getCustomRepository(UserRepository).save(user)
     /**
      * @todo should redirect page to a react page
      */

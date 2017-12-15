@@ -1,10 +1,10 @@
 import { Entity, Column, OneToOne, JoinColumn } from 'typeorm'
-import Base from './base'
-import User from './user'
+import { Base } from './base'
+import { User } from './user'
 import { OAuthBearerWithRefresh } from '../types'
 
 @Entity()
-export default class GoogleAuthentication extends Base implements OAuthBearerWithRefresh {
+export class GoogleAuthentication extends Base implements OAuthBearerWithRefresh {
   @Column()
   refreshToken: string
 

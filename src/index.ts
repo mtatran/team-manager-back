@@ -2,7 +2,8 @@ import 'reflect-metadata'
 import { config } from 'dotenv'
 import { createConnection, ConnectionOptions } from 'typeorm'
 import * as path from 'path'
-import log from './utils/log'
+import { log } from './utils/log'
+import { app } from './app'
 
 config()  // Import .env file
 
@@ -21,9 +22,9 @@ async function init () {
   }
 
   await createConnection(connectionSettings)
-  const app = require('./app').default
-  const port = Number(process.env.PORT)
+  log.info(`Connected to database`)
 
+  const port = Number(process.env.PORT)
   app.listen(port, () => log.info(`Server started and listening on port ${port}`))
 }
 

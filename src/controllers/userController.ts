@@ -1,11 +1,12 @@
-import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore } from 'routing-controllers'
+import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore, BodyParam, OnNull } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import * as passport from 'passport'
-import UserService from '../services/userService'
 import * as UserPresentation from '../presentations/userPresentation'
-import User from '../models/user'
+import { User } from '../models/user'
 import { Authority } from '../types'
 import { Response } from 'express'
+import { getCustomRepository } from 'typeorm'
+import { UserRepository } from '../repositories/userRepository'
 
 @JsonController('/users')
 export default class UserController {
@@ -44,7 +45,7 @@ export default class UserController {
     user.password = await bcrypt.hash(body.password, 10)
     user.authority = Authority.member
 
-    return UserService.save(user)
+    return getCustomRepository(UserRepository).save(user)
   }
 
   /**
@@ -63,9 +64,17 @@ export default class UserController {
     }
    */
   @Post('/login')
-  @UseBefore(passport.authenticate('local', { session: false }))
-  async login (@CurrentUser() user: User, @Res() res: Response) {
-    let jwt = UserService.createUserJwtToken(user)
+  @OnNull(401)
+  async login (
+    @BodyParam('email') email: string,
+    @BodyParam('password') password: string,
+    @Res() res: Response) {
+    const userRepo = getCustomRepository(UserRepository)
+    const user = await userRepo.findByLogin(email, password)
+
+    if (!user) return null
+
+    let jwt = user.getJwtToken(process.env.API_SECRET as string)
     res.cookie('authorization', jwt, { httpOnly: true })
     return null
   }
