@@ -1,12 +1,13 @@
 import { Entity, Column, OneToOne, OneToMany } from 'typeorm'
 import { IsAlpha, Length, IsMobilePhone, IsEmail, IsOptional, IsBoolean, IsString } from 'class-validator'
-import Base from './base'
-import GoogleAuthentication from './googleAuthentication'
-import Position from './position'
-import { Authority } from '../types'
+import { Base } from './base'
+import { GoogleAuthentication } from './googleAuthentication'
+import { Position } from './position'
+import { Authority, JwtToken } from '../types'
+import { sign } from 'jsonwebtoken'
 
 @Entity()
-export default class User extends Base {
+export class User extends Base {
   @IsAlpha({message: 'You can only have letters in your name'})
   @Column()
   firstName: string
@@ -58,4 +59,14 @@ export default class User extends Base {
     eager: true
   })
   positions: Position[]
+
+  getJwtToken (secret: string) {
+    const fields: JwtToken = {
+      id: this.id,
+      email: this.email,
+      authority: this.authority
+    }
+
+    return sign(fields, process.env.API_SECRET as string)
+  }
 }

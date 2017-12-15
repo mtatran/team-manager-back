@@ -1,4 +1,4 @@
-import Team from '../models/team'
+import { Team } from '../models/team'
 import { teamPosition } from './positionPresentation'
 
 /**

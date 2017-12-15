@@ -1,6 +1,6 @@
 import { CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm'
 
-export default class Base {
+export class Base {
   @PrimaryGeneratedColumn()
   id: number
 

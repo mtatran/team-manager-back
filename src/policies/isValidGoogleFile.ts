@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import User from '../models/user'
+import { User } from '../models/user'
 import GoogleService from '../services/googleService'
 import { OAuthBearer } from '../types'
 
