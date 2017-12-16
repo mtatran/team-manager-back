@@ -7,7 +7,7 @@ import { Position } from './position'
 @Entity()
 export class Team extends Base {
   @IsAlphanumeric()
-  @Column({ unique: true, length: 20})
+  @Column({ unique: true, length: 20 })
   name: string
 
   @OneToMany(type => Position, pos => pos.team, {

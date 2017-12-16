@@ -1,4 +1,4 @@
-import { JsonController, Redirect, Get, CurrentUser, Authorized, Param, BadRequestError } from 'routing-controllers'
+import { JsonController, Redirect, Get, CurrentUser, Authorized, Param, BadRequestError, QueryParam } from 'routing-controllers'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import { User } from '../models/user'
@@ -91,11 +91,13 @@ export default class GoogleController {
    * @apiParam {string} [q] Search Query
    * @apiParam {Integer} [pageToken] Page token for requesting a certain page
    */
+  @Get('/files')
+  @Authorized(['google'])
   async getFiles (
-    @CurrentUser() user: AuthedUser,
-    @Param('pageSize') pageSize: string = '50',
-    @Param('q') q: string,
-    @Param('pageToken') pageToken: string
+    @CurrentUser({ required: true }) user: AuthedUser,
+    @QueryParam('pageSize') pageSize: string = '50',
+    @QueryParam('q') q: string,
+    @QueryParam('pageToken') pageToken: string
   ) {
     const options: DriveListOptions = {
       pageSize: parseInt(pageSize, 10),

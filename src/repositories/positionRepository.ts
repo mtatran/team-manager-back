@@ -9,8 +9,8 @@ import { PositionLevel } from '../types/index'
 export class PositionRepository extends BaseRepository<Position> {
   async createPosition (user: User, team: Team, level: PositionLevel) {
     const existingPosition = await this.findOne({ where: {
-      user,
-      team
+      user: user.id,
+      team: team.id
     }})
 
     if (existingPosition) {

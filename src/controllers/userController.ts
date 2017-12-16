@@ -1,4 +1,4 @@
-import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore, BodyParam, OnNull } from 'routing-controllers'
+import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore, BodyParam, OnNull, OnUndefined } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import * as passport from 'passport'
 import * as UserPresentation from '../presentations/userPresentation'
@@ -64,7 +64,7 @@ export default class UserController {
     }
    */
   @Post('/login')
-  @OnNull(401)
+  @OnUndefined(401)
   async login (
     @BodyParam('email') email: string,
     @BodyParam('password') password: string,
@@ -72,10 +72,11 @@ export default class UserController {
     const userRepo = getCustomRepository(UserRepository)
     const user = await userRepo.findByLogin(email, password)
 
-    if (!user) return null
+    if (!user) return
 
     let jwt = user.getJwtToken(process.env.API_SECRET as string)
     res.cookie('authorization', jwt, { httpOnly: true })
+
     return null
   }
 
