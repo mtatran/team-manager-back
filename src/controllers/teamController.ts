@@ -154,9 +154,9 @@ export default class UserController {
     file.fileId = fileId
     file.owner = user
     file.permission = FilePermission[permission]
+    file.team = team
 
-    team.files.push(file)
-    await getCustomRepository(TeamRepository).save(team)
+    await getCustomRepository(FileRepository).save(file)
 
     const promises = team.positions.map(pos => (
         GoogleService.giveEmailFilePermission(
