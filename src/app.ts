@@ -9,13 +9,11 @@ import { authorizationChecker } from './authentication/authorizationChecker'
 
 export const app: express.Express = express()
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
 useExpressServer(app, {
   routePrefix: '/api',
-  controllers: [path.join(__dirname, 'controllers', '*')],
+  controllers: [path.join(__dirname, 'controllers', '**')],
   currentUserChecker,
   authorizationChecker
 })

@@ -109,7 +109,10 @@ export default class UserController {
     const team: Team = await this.getTeamById(teamId)
     const user: User = await this.getUserById(userId)
 
-    await getCustomRepository(PositionRepository).createPosition(user, team, PositionLevel.member)
+    const newPositions = team.positions.filter(position => position.id !== user.id)
+    team.positions = newPositions
+
+    await getCustomRepository(PositionRepository).save(newPositions)
     return null
   }
 
