@@ -81,15 +81,15 @@ export default class UserController {
   }
 
   /**
-   * @api {get} /users/profile Get Self Profile
-   * @apiName getProfile
+   * @api {get} /users Get User Profile
+   * @apiName getUsers
    * @apiGroup Users
-   * @apiVersion  1.0.0
-   *
-   * @apiUse success_user_full
+   * @apiVersion 1.0.0
    */
-  @Get('/profile')
-  async getProfile (@CurrentUser() user: User) {
-    return UserPresentation.fullUser(user)
+  @Get('')
+  async getUsers () {
+    const userRepo = getCustomRepository(UserRepository)
+
+    return userRepo.findAllUsersWithTeam()
   }
 }

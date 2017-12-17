@@ -16,6 +16,18 @@ export class UserRepository extends BaseRepository<User> {
     return user
   }
 
+  async findAllUsersWithTeam () {
+    return this.find({
+      join: {
+        alias: 'user',
+        leftJoinAndSelect: {
+          'positions': 'user.positions',
+          'team': 'positions.team'
+        }
+      }
+    })
+  }
+
   async getAdminUser () {
     const admin = await this.findOne({
       where: { authority: Authority.admin },
