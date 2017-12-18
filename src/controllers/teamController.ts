@@ -46,6 +46,17 @@ export default class UserController {
   }
 
   /**
+   * @api {GET} /teams Get all teams
+   * @apiName getAllTeams
+   * @apiGroup Teams
+   * @apiVersion 1.0.0
+   */
+  @Get('')
+  async getAllTeams () {
+    return getCustomRepository(TeamRepository).findAllWithUsers()
+  }
+
+  /**
    * @api {GET} /teams/:teamId Get Team Info
    * @apiName getTeam
    * @apiGroup Teams
