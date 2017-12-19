@@ -38,9 +38,9 @@ export class UserRepository extends BaseRepository<User> {
     return admin
   }
 
-  removeAdminFromCache () {
+  async removeAdminFromCache () {
     const queryResultCache = getConnection().queryResultCache
-    if (queryResultCache) queryResultCache.remove(['admin_user'])
+    if (queryResultCache) await queryResultCache.remove(['admin_user'])
   }
 
 }

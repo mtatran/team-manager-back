@@ -2,7 +2,7 @@ import { Request } from 'express'
 import { Action } from 'routing-controllers'
 import { verify } from 'jsonwebtoken'
 import { getCustomRepository } from 'typeorm'
-import { JwtToken, Authority } from '../types/index'
+import { JwtToken } from '../types/index'
 import { UserRepository } from '../repositories/userRepository'
 
 export function currentUserChecker (action: Action) {
