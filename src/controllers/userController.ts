@@ -1,7 +1,5 @@
-import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore, BodyParam, OnNull, OnUndefined } from 'routing-controllers'
+import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
-import * as passport from 'passport'
-import * as UserPresentation from '../presentations/userPresentation'
 import { User } from '../models/user'
 import { Authority } from '../types'
 import { Response } from 'express'
@@ -72,7 +70,7 @@ export default class UserController {
     const userRepo = getCustomRepository(UserRepository)
     const user = await userRepo.findByLogin(email, password)
 
-    if (!user) return
+    if (!user) return undefined
 
     let jwt = user.getJwtToken(process.env.API_SECRET as string)
     res.cookie('authorization', jwt, { httpOnly: true })

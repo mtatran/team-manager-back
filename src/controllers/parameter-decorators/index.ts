@@ -1,4 +1,4 @@
-import { createParamDecorator, Action, InternalServerError } from 'routing-controllers'
+import { createParamDecorator, InternalServerError } from 'routing-controllers'
 import GoogleService from '../../services/googleService'
 import { OAuthBearer } from '../../types'
 import { getCustomRepository } from 'typeorm'
@@ -20,7 +20,7 @@ export function AdminUser (options?: { required?: boolean }) {
         admin.googleAuth.token = newBearer.token
         admin.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
         await userRepo.saveWithValidation(admin)
-        userRepo.removeAdminFromCache() // Uncache the admin so it changes later on
+        await userRepo.removeAdminFromCache() // Uncache the admin so it changes later on
       }
 
       return admin

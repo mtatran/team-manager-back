@@ -1,9 +1,5 @@
-import { JsonController, Redirect, Get, Post, CurrentUser, Authorized, Param, Body, BadRequestError, NotFoundError, Delete, Res, UseBefore, BodyParam, OnNull, OnUndefined } from 'routing-controllers'
-import { User } from '../models/user'
-import { Authority } from '../types'
-import { Response } from 'express'
+import { JsonController, Param, NotFoundError, Delete } from 'routing-controllers'
 import { getCustomRepository } from 'typeorm'
-import { UserRepository } from '../repositories/userRepository'
 import { PositionRepository } from '../repositories/positionRepository'
 
 @JsonController('/positions')
