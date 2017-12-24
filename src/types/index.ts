@@ -16,7 +16,7 @@ export enum PositionLevel {
 }
 
 export interface JwtToken {
-  id: Number
+  id: number
   email: string
   authority: Authority
 }
