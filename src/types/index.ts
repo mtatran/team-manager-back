@@ -1,3 +1,7 @@
+export interface Roles {
+  admin?: boolean
+  google?: boolean
+}
 
 export enum Authority {
   member = 'member',
