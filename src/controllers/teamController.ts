@@ -12,6 +12,9 @@ import { UserRepository } from '../repositories/userRepository'
 import { TeamRepository } from '../repositories/teamRepository'
 import { PositionRepository } from '../repositories/positionRepository'
 import { FileRepository } from '../repositories/fileRepository'
+import { teamService } from '../services/teamService'
+import { userService } from '../services/userService'
+import { Position } from '../models/position'
 
 @JsonController('/teams')
 export default class UserController {
@@ -55,6 +58,15 @@ export default class UserController {
     return getCustomRepository(TeamRepository).findAllWithUsers()
   }
 
+  @Get('/preview')
+  async getAllTeamsPreview () {
+    const teamRepo = getCustomRepository(TeamRepository)
+
+    return teamRepo.find({
+      select: ['id', 'name']
+    })
+  }
+
   /**
    * @api {GET} /teams/:teamId Get Team Info
    * @apiName getTeam
@@ -65,7 +77,7 @@ export default class UserController {
    */
   @Get('/:teamId')
   async getTeam (@Param('teamId') teamId: string) {
-    return this.getTeamById(teamId)
+    return teamService.findOneById(teamId)
   }
 
   /**
@@ -93,12 +105,18 @@ export default class UserController {
   @Post('/:teamId/users')
   async addUserToTeam (
     @Param('teamId') teamId: string,
-    @BodyParam('userId') userId: number
+    @BodyParam('userId') userId: number,
+    @BodyParam('level') level: PositionLevel
   ) {
-    const team: Team = await this.getTeamById(teamId)
-    const user: User = await this.getUserById(userId)
+    const team: Team = await teamService.findOneById(teamId)
+    const user: User = await userService.findOneById(userId)
 
-    await getCustomRepository(PositionRepository).createPosition(user, team, PositionLevel.member)
+    const position = new Position()
+    position.user = user
+    position.team = team
+    position.level = level || PositionLevel.member
+
+    await getCustomRepository(PositionRepository).saveWithValidation(position)
     return null
   }
 
@@ -116,8 +134,8 @@ export default class UserController {
     @Param('teamId') teamId: string,
     @Param('userId') userId: string
   ) {
-    const team: Team = await this.getTeamById(teamId)
-    const user: User = await this.getUserById(userId)
+    const team: Team = await teamService.findOneById(teamId)
+    const user: User = await userService.findOneById(userId)
 
     const newPositions = team.positions.filter(position => position.id !== user.id)
     team.positions = newPositions
@@ -149,7 +167,7 @@ export default class UserController {
     @BodyParam('permission') permission: string,
     @BodyParam('fileId') fileId: string
   ) {
-    const team: Team = await this.getTeamById(teamId)
+    const team: Team = await teamService.findOneById(teamId)
 
     if (!(permission in FilePermission)) {
       throw new BadRequestError('Permission must be reader or writer')
@@ -200,7 +218,7 @@ export default class UserController {
     @Param('teamId') teamId: string,
     @Param('fileId') fileId: string
   ) {
-    const team = await this.getTeamById(teamId)
+    const team = await teamService.findOneById(teamId)
     team.files = team.files.filter(file => file.fileId === fileId)
 
     await getCustomRepository(TeamRepository).save(team)
@@ -254,19 +272,5 @@ export default class UserController {
 
   private getMaxPermission (permissions: FilePermission[]) {
     return permissions.reduce((pre, curr) => Math.max(pre, curr), FilePermission.none)
-  }
-
-  private async getUserById (id: string | number ) {
-    const user = await getCustomRepository(UserRepository).findOneById(id)
-    if (!user) throw new NotFoundError(`There is no user with id ${id}`)
-
-    return user
-  }
-
-  private async getTeamById (id: string | number ) {
-    const team = await getCustomRepository(TeamRepository).findOneById(id)
-    if (!team) throw new NotFoundError(`There is no team with id ${id}`)
-
-    return team
   }
 }

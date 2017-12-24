@@ -87,7 +87,15 @@ export default class UserController {
   @Get('')
   async getUsers () {
     const userRepo = getCustomRepository(UserRepository)
-
     return userRepo.findAllUsersWithTeam()
+  }
+
+  @Get('/preview')
+  async getUsersPreview () {
+    const userRepo = getCustomRepository(UserRepository)
+
+    return userRepo.find({
+      select: ['id', 'firstName', 'lastName', 'email', 'slackTag']
+    })
   }
 }

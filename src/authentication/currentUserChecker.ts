@@ -4,6 +4,7 @@ import { verify } from 'jsonwebtoken'
 import { getCustomRepository } from 'typeorm'
 import { JwtToken } from '../types/index'
 import { UserRepository } from '../repositories/userRepository'
+import { userService } from '../services/userService'
 
 export function currentUserChecker (action: Action) {
   const request: Request = action.request
@@ -26,7 +27,7 @@ export function currentUserChecker (action: Action) {
     if (!tokenData) return null
 
     const userId = tokenData.id
-    return getCustomRepository(UserRepository).findOneById(userId)
+    return userService.findOneById(userId)
   } catch (e) {
     return null
   }

@@ -7,7 +7,9 @@ import { UserRepository } from '../repositories/userRepository'
 import GoogleService from '../services/googleService'
 import { User } from '../models/user'
 
-export async function authorizationChecker (action: Action, roles: Roles) {
+export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
+  const roles: Roles = rolesArg[0] || {}
+
   const request: Request = action.request
 
   const authorizationToken = request.cookies.auth
