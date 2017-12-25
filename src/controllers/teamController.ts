@@ -58,7 +58,7 @@ export default class UserController {
     return getCustomRepository(TeamRepository).findAllWithUsers()
   }
 
-  @Get('/preview')
+  @Get('/all/preview')
   async getAllTeamsPreview () {
     const teamRepo = getCustomRepository(TeamRepository)
 
