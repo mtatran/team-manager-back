@@ -1,10 +1,12 @@
 import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import { User } from '../models/user'
-import { Authority } from '../types'
+import { Authority, PositionLevel } from '../types'
 import { Response } from 'express'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
+import { TeamRepository } from '../repositories/teamRepository'
+import { Position } from '../models/position'
 
 @JsonController('/users')
 export default class UserController {
@@ -32,7 +34,7 @@ export default class UserController {
         password: "password"
      }
    */
-  @Post('/signup')
+  @Post('')
   async createUser (@Body() body: any) {
     const user = new User()
     user.address = body.address
@@ -42,6 +44,17 @@ export default class UserController {
     user.phoneNumber = body.phoneNumber
     user.password = await bcrypt.hash(body.password, 10)
     user.authority = Authority.member
+
+    if (body.teams) {
+      const teams = await getCustomRepository(TeamRepository).findByIds(body.teams)
+      user.positions = teams.map(team => {
+        const pos = new Position()
+        pos.level = PositionLevel.member
+        pos.team = team
+
+        return pos
+      })
+    }
 
     return getCustomRepository(UserRepository).save(user)
   }
