@@ -12,7 +12,7 @@ export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
 
   const request: Request = action.request
 
-  const authorizationToken = request.cookies.auth
+  const authorizationToken = request.cookies.authorization
   if (!authorizationToken) return false
 
   let tokenData
