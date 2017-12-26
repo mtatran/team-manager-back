@@ -65,7 +65,6 @@ export interface AddPermissionOptions {
 class GoogleService {
   static USER_REDIRECT = 'https://accounts.google.com/o/oauth2/v2/auth'
   static AUTH_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
-  static CALLBACK_URL = `${process.env.URL}/api/google/callback`
   static FILE_LIST_URL = 'https://www.googleapis.com/drive/v3/files'
 
   /**
@@ -75,7 +74,7 @@ class GoogleService {
   static getAuthUrl (): string {
     const params = {
       client_id: googleConfig.client_id,
-      redirect_uri: this.CALLBACK_URL,
+      redirect_uri: this.callBackUrl,
       scope: 'https://www.googleapis.com/auth/drive',
       access_type: 'offline',
       response_type: 'code',
@@ -247,7 +246,7 @@ class GoogleService {
       refresh_token: refresh ? code : undefined,
       client_id: googleConfig.client_id,
       client_secret: process.env.GOOGLE_SECRET,
-      redirect_uri: this.CALLBACK_URL,
+      redirect_uri: this.callBackUrl,
       grant_type: refresh ? 'refresh_token' : 'authorization_code'
     }
 
@@ -269,6 +268,10 @@ class GoogleService {
       token: auth.access_token,
       tokenExpireDate: new Date(Date.now() + auth.expires_in)
     }
+  }
+
+  private static get callBackUrl () {
+    return `${process.env.HOST}/api/google/callback`
   }
 }
 

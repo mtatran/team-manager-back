@@ -1,11 +1,9 @@
+require('dotenv').config()
 import 'reflect-metadata'
-import { config } from 'dotenv'
 import { createConnection, ConnectionOptions } from 'typeorm'
 import * as path from 'path'
 import { log } from './utils/log'
 import { app } from './app'
-
-config()  // Import .env file
 
 function stringIsTruthy (str: String | undefined): boolean {
   let s = (str || '').toLowerCase()
