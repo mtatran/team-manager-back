@@ -155,36 +155,6 @@
     "name": "ObjectUserposition"
   },
   {
-    "type": "DELETE",
-    "url": "/teams/:teamId/file/:fileId",
-    "title": "Add file to team",
-    "name": "addFileToTeam",
-    "group": "Teams",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "teamId",
-            "description": "<p>Should be the valid mongodb team id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "fileId",
-            "description": "<p>Should be the file id from google drive</p>"
-          }
-        ]
-      }
-    },
-    "filename": "src/controllers/teamController.ts",
-    "groupTitle": "Teams"
-  },
-  {
     "type": "POST",
     "url": "/teams/:teamId/file",
     "title": "Add file to team",
@@ -224,6 +194,36 @@
           "type": "JSON"
         }
       ]
+    },
+    "filename": "src/controllers/teamController.ts",
+    "groupTitle": "Teams"
+  },
+  {
+    "type": "DELETE",
+    "url": "/teams/:teamId/file/:fileId",
+    "title": "Add file to team",
+    "name": "addFileToTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "teamId",
+            "description": "<p>Should be the valid mongodb team id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "fileId",
+            "description": "<p>Should be the file id from google drive</p>"
+          }
+        ]
+      }
     },
     "filename": "src/controllers/teamController.ts",
     "groupTitle": "Teams"
@@ -417,78 +417,6 @@
           {
             "group": "Parameter",
             "type": "String",
-            "optional": true,
-            "field": "address",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "firstName",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "lastName",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "phoneNumber",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "authority",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Request-Example:",
-          "content": "{\n   address: \"111 waterloo st\",\n   email: \"me@tylerzhang.com\",\n   firstName: \"tyler\",\n   lastName: \"zhang\",\n   phoneNumber: \"123-456-789\",\n   password: \"password\"\n}",
-          "type": "JSON"
-        }
-      ]
-    },
-    "filename": "src/controllers/userController.ts",
-    "groupTitle": "Users"
-  },
-  {
-    "type": "POST",
-    "url": "/users/login",
-    "title": "Login",
-    "name": "login",
-    "group": "Users",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
             "optional": false,
             "field": "email",
             "description": ""
@@ -582,7 +510,7 @@
         }
       ]
     },
-    "filename": "src/controllers/positionController.ts",
+    "filename": "src/controllers/userController.ts",
     "groupTitle": "Users"
   },
   {
