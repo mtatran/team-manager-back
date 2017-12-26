@@ -38,11 +38,12 @@ export default class GoogleController {
    * @apiVersion  1.0.0
    */
   @Get('/callback')
+  @Redirect('/connections')
   @Authorized()
   async googleCallBack (
     @CurrentUser() user: User,
-    @Param('error') error: string,
-    @Param('code') code: string
+    @QueryParam('error') error: string,
+    @QueryParam('code') code: string
   ) {
     if ( error ) throw new BadRequestError(error)
 
@@ -59,10 +60,6 @@ export default class GoogleController {
 
     user.googleAuth = googleAuth
     await getCustomRepository(UserRepository).save(user)
-    /**
-     * @todo should redirect page to a react page
-     */
-    return null
   }
 
   /**
