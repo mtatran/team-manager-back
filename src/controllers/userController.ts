@@ -34,6 +34,7 @@ export default class UserController {
         password: "password"
      }
    */
+  @Authorized({ admin: true })
   @Post('')
   async createUser (@Body() body: any) {
     const user = new User()
@@ -43,7 +44,7 @@ export default class UserController {
     user.lastName = body.lastName
     user.phoneNumber = body.phoneNumber
     user.password = await bcrypt.hash(body.password, 10)
-    user.authority = Authority.member
+    user.authority = body.authority || Authority.member
 
     if (body.teams) {
       const teams = await getCustomRepository(TeamRepository).findByIds(body.teams)
