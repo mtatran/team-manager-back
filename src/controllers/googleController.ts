@@ -1,4 +1,4 @@
-import { JsonController, Redirect, Get, CurrentUser, Authorized, Param, BadRequestError, QueryParam } from 'routing-controllers'
+import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam } from 'routing-controllers'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import { User } from '../models/user'

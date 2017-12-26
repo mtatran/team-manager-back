@@ -5,7 +5,6 @@ import { JwtToken, Authority, Roles, OAuthBearer } from '../types/index'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
 import GoogleService from '../services/googleService'
-import { User } from '../models/user'
 
 export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
   const roles: Roles = rolesArg[0] || {}
