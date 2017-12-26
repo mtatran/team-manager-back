@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined } from 'routing-controllers'
+import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined, Authorized, CurrentUser } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import { User } from '../models/user'
 import { Authority, PositionLevel } from '../types'
@@ -110,5 +110,22 @@ export default class UserController {
     return userRepo.find({
       select: ['id', 'firstName', 'lastName', 'email', 'slackTag']
     })
+  }
+
+  @Get('/me/info')
+  @Authorized()
+  async getUserInfo (@CurrentUser() user: User) {
+    const info = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      address: user.address,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      authority: user.authority,
+      slackTag: user.slackTag,
+      googleAuth: !!user.googleAuth
+    }
+
+    return info
   }
 }
