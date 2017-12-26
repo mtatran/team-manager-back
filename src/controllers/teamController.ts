@@ -1,5 +1,5 @@
 
-import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, NotFoundError, Delete } from 'routing-controllers'
+import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import GoogleService, { DriveFilePermission } from '../services/googleService'

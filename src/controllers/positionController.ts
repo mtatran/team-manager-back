@@ -3,7 +3,6 @@ import { getCustomRepository } from 'typeorm'
 import { PositionRepository } from '../repositories/positionRepository'
 import { userService } from '../services/userService'
 import { teamService } from '../services/teamService'
-import { Position } from '../models/position'
 import { PositionLevel } from '../types/index'
 
 @JsonController('/positions')
