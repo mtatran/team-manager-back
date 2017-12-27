@@ -1,12 +1,12 @@
 
-import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete } from 'routing-controllers'
+import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParam, QueryParams } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
 import { Team } from '../models/team'
 import { File } from '../models/file'
 import { User } from '../models/user'
-import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction } from '../types'
+import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction, ApiFindQuery } from '../types'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
 import { TeamRepository } from '../repositories/teamRepository'
@@ -49,13 +49,40 @@ export default class UserController {
 
   /**
    * @api {GET} /teams Get all teams
-   * @apiName getAllTeams
+   * @apiName findAllTeams
    * @apiGroup Teams
    * @apiVersion 1.0.0
    */
   @Get('')
-  async getAllTeams () {
-    return getCustomRepository(TeamRepository).findAllWithUsers()
+  async findAllTeams (@QueryParams() params: ApiFindQuery<Team>) {
+    const teamRepo = getCustomRepository(TeamRepository)
+
+    let query = teamRepo.createQueryBuilder('team')
+
+    if (params.q) {
+      query = query.where('team.name LIKE CONCAT("%", :q, "%")', { q: params.q })
+    }
+
+    if (params.order) {
+      query = query.orderBy(params.order, params.orderDir || 'ASC')
+    }
+
+    const pageSize = parseInt(params.pageSize as any, 10) || 50
+    const page = parseInt(params.page as any, 10) || 0
+
+    return query
+      .limit(pageSize)
+      .offset(pageSize * page)
+      .leftJoinAndSelect('team.positions', 'position')
+      .leftJoin('position.user', 'user')
+      .addSelect([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.email',
+        'user.authority'
+      ])
+      .getMany()
   }
 
   @Get('/all/preview')
