@@ -1,7 +1,7 @@
-import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined, Authorized, CurrentUser } from 'routing-controllers'
+import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined, Authorized, CurrentUser, QueryParams } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import { User } from '../models/user'
-import { Authority, PositionLevel } from '../types'
+import { Authority, PositionLevel, ApiFindQuery } from '../types'
 import { Response } from 'express'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
@@ -94,14 +94,50 @@ export default class UserController {
 
   /**
    * @api {get} /users Get User Profile
-   * @apiName getUsers
+   * @apiName findAllUsers
    * @apiGroup Users
    * @apiVersion 1.0.0
    */
   @Get('')
-  async getUsers () {
+  async findAllUsers (
+    @QueryParams() params: ApiFindQuery<User>
+  ) {
     const userRepo = getCustomRepository(UserRepository)
-    return userRepo.findAllUsersWithTeam()
+
+    let query = userRepo.createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.address',
+        'user.phoneNumber',
+        'user.email',
+        'user.authority',
+        'user.createDate',
+        'user.updateDate'
+      ])
+
+    if (params.q) {
+      query = query.where('CONCAT(user.firstName, " ", user.lastName) LIKE CONCAT("%", :q, "%")', { q: params.q })
+      query = query.orWhere('user.phoneNumber LIKE CONCAT("%", :q, "%")', { q: params.q })
+      query = query.orWhere('user.email LIKE CONCAT("%", :q, "%")', { q: params.q })
+      query = query.orWhere('user.authority LIKE CONCAT("%", :q, "%")', { q: params.q })
+      query = query.orWhere('user.slackTag LIKE CONCAT("%", :q, "%")', { q: params.q })
+    }
+
+    if (params.order) {
+      query = query.orderBy(params.order, params.orderDir || 'ASC')
+    }
+
+    const pageSize = parseInt(params.pageSize as any, 10) || 50
+    const page = parseInt(params.page as any, 10) || 0
+
+    return query
+      .limit(pageSize)
+      .offset(pageSize * page)
+      .leftJoinAndSelect('user.positions', 'position')
+      .leftJoinAndSelect('position.team', 'team')
+      .getMany()
   }
 
   @Get('/all/preview')

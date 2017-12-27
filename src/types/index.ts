@@ -62,3 +62,11 @@ interface FilePermissionCreateAction extends FilePermissionBaseAction {
 
 export type FilePermissionAction = FilePermissionChangeAction | FilePermissionDeleteAction |
   FilePermissionCreateAction
+
+export interface ApiFindQuery<Model> {
+  q?: string
+  pageSize?: string
+  page?: string
+  order?: keyof Model
+  orderDir?: 'ASC' | 'DESC'
+}
