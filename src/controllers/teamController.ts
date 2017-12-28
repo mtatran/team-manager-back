@@ -82,7 +82,7 @@ export default class UserController {
         'user.email',
         'user.authority'
       ])
-      .getMany()
+      .getManyAndCount()
 
     return { data, total }
   }
