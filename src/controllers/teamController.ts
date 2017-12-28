@@ -1,5 +1,5 @@
 
-import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParam, QueryParams } from 'routing-controllers'
+import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
@@ -10,10 +10,8 @@ import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction, ApiFi
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
 import { TeamRepository } from '../repositories/teamRepository'
-import { PositionRepository } from '../repositories/positionRepository'
 import { FileRepository } from '../repositories/fileRepository'
 import { teamService } from '../services/teamService'
-import { userService } from '../services/userService'
 import { Position } from '../models/position'
 
 @JsonController('/teams')
@@ -38,10 +36,25 @@ export default class UserController {
     message: "team created"
      }
   */
-  @Post('/create')
-  async create ( @BodyParam('name', { required: true }) name: string) {
+  @Post()
+  async create (
+    @BodyParam('name', { required: true }) name: string,
+    @BodyParam('users') users: string[] |null
+  ) {
     const team = new Team()
     team.name = name
+
+    if (users) {
+      const initialUsers = await getCustomRepository(UserRepository)
+        .findByIds(users)
+
+      team.positions = initialUsers.map(user => {
+        const pos = new Position()
+        pos.user = user
+        pos.level = PositionLevel.member
+        return pos
+      })
+    }
 
     await getCustomRepository(TeamRepository).save(team)
     return null
@@ -53,7 +66,7 @@ export default class UserController {
    * @apiGroup Teams
    * @apiVersion 1.0.0
    */
-  @Get('')
+  @Get()
   async findAllTeams (@QueryParams() params: ApiFindQuery<Team>) {
     const teamRepo = getCustomRepository(TeamRepository)
 
