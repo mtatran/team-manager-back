@@ -7,7 +7,6 @@ import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
 import { TeamRepository } from '../repositories/teamRepository'
 import { Position } from '../models/position'
-import { race } from 'q'
 
 @JsonController('/users')
 export default class UserController {
@@ -36,7 +35,7 @@ export default class UserController {
      }
    */
   @Authorized({ admin: true })
-  @Post('')
+  @Post()
   async createUser (@Body() body: any) {
     const user = new User()
     user.address = body.address
@@ -99,7 +98,7 @@ export default class UserController {
    * @apiGroup Users
    * @apiVersion 1.0.0
    */
-  @Get('')
+  @Get()
   async findAllUsers (
     @QueryParams() params: ApiFindQuery<User>
   ) {
