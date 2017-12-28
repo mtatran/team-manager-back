@@ -70,7 +70,7 @@ export default class UserController {
     const pageSize = parseInt(params.pageSize as any, 10) || 50
     const page = parseInt(params.page as any, 10) || 0
 
-    return query
+    const [data, total] = await query
       .limit(pageSize)
       .offset(pageSize * page)
       .leftJoinAndSelect('team.positions', 'position')
@@ -83,6 +83,8 @@ export default class UserController {
         'user.authority'
       ])
       .getMany()
+
+    return { data, total }
   }
 
   @Get('/all/preview')
