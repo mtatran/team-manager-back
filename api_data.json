@@ -155,6 +155,36 @@
     "name": "ObjectUserposition"
   },
   {
+    "type": "DELETE",
+    "url": "/teams/:teamId/file/:fileId",
+    "title": "Add file to team",
+    "name": "addFileToTeam",
+    "group": "Teams",
+    "version": "1.0.0",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "teamId",
+            "description": "<p>Should be the valid mongodb team id</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "fileId",
+            "description": "<p>Should be the file id from google drive</p>"
+          }
+        ]
+      }
+    },
+    "filename": "src/controllers/teamController.ts",
+    "groupTitle": "Teams"
+  },
+  {
     "type": "POST",
     "url": "/teams/:teamId/file",
     "title": "Add file to team",
@@ -191,75 +221,6 @@
         {
           "title": "Request-Example:",
           "content": "{\n  permission: \"reader\"\n}",
-          "type": "JSON"
-        }
-      ]
-    },
-    "filename": "src/controllers/teamController.ts",
-    "groupTitle": "Teams"
-  },
-  {
-    "type": "DELETE",
-    "url": "/teams/:teamId/file/:fileId",
-    "title": "Add file to team",
-    "name": "addFileToTeam",
-    "group": "Teams",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "teamId",
-            "description": "<p>Should be the valid mongodb team id</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "fileId",
-            "description": "<p>Should be the file id from google drive</p>"
-          }
-        ]
-      }
-    },
-    "filename": "src/controllers/teamController.ts",
-    "groupTitle": "Teams"
-  },
-  {
-    "type": "POST",
-    "url": "/teams/:teamId/add",
-    "title": "Add User",
-    "name": "addUserToTeam",
-    "group": "Teams",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "teamId",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "userId",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "success": {
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "{\n  message: \"done\"\n}",
           "type": "JSON"
         }
       ]
@@ -321,7 +282,7 @@
     "type": "GET",
     "url": "/teams",
     "title": "Get all teams",
-    "name": "getAllTeams",
+    "name": "findAllTeams",
     "group": "Teams",
     "version": "1.0.0",
     "filename": "src/controllers/teamController.ts",
@@ -365,79 +326,12 @@
     }
   },
   {
-    "type": "DELETE",
-    "url": "/teams/:teamId/add",
-    "title": "Remove User",
-    "name": "removeUserFromTeam",
-    "group": "Teams",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "userId",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "teamId",
-            "description": ""
-          }
-        ]
-      }
-    },
-    "filename": "src/controllers/teamController.ts",
-    "groupTitle": "Teams"
-  },
-  {
     "type": "get",
     "url": "/users",
     "title": "Get User Profile",
-    "name": "getUsers",
+    "name": "findAllUsers",
     "group": "Users",
     "version": "1.0.0",
-    "filename": "src/controllers/userController.ts",
-    "groupTitle": "Users"
-  },
-  {
-    "type": "POST",
-    "url": "/users/login",
-    "title": "Login",
-    "name": "login",
-    "group": "Users",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": ""
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": ""
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Request-Example:",
-          "content": "{\n  email: \"me@tylerzhang.com\",\n  password: \"password\"\n}",
-          "type": "JSON"
-        }
-      ]
-    },
     "filename": "src/controllers/userController.ts",
     "groupTitle": "Users"
   },
@@ -506,6 +400,43 @@
         {
           "title": "Request-Example:",
           "content": "{\n   address: \"111 waterloo st\",\n   email: \"me@tylerzhang.com\",\n   firstName: \"tyler\",\n   lastName: \"zhang\",\n   phoneNumber: \"123-456-789\",\n   password: \"password\"\n}",
+          "type": "JSON"
+        }
+      ]
+    },
+    "filename": "src/controllers/userController.ts",
+    "groupTitle": "Users"
+  },
+  {
+    "type": "POST",
+    "url": "/users/login",
+    "title": "Login",
+    "name": "login",
+    "group": "Users",
+    "version": "1.0.0",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": ""
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Request-Example:",
+          "content": "{\n  email: \"me@tylerzhang.com\",\n  password: \"password\"\n}",
           "type": "JSON"
         }
       ]
