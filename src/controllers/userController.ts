@@ -126,13 +126,14 @@ export default class UserController {
     }
 
     if (params.order) {
-      query = query.orderBy(params.order, params.orderDir || 'ASC')
+      query = query.orderBy(`user.${params.order}`, params.orderDir || 'ASC')
     }
 
     const pageSize = parseInt(params.pageSize as any, 10) || 50
     const page = parseInt(params.page as any, 10) || 0
 
     const [data, total] = await query
+      .addOrderBy('user.id', 'ASC')
       .limit(pageSize)
       .offset(pageSize * page)
       .leftJoinAndSelect('user.positions', 'position')
