@@ -9,7 +9,7 @@ export function AdminUser (options?: { required?: boolean }) {
     required: options && options.required ? true : false,
     value: async () => {
       const userRepo = getCustomRepository(UserRepository)
-      const admin = await userRepo.getAdminUser()
+      const admin = await userRepo.getSuperAdminUser()
 
       if (!admin.googleAuth) throw new InternalServerError('Admin has not been authenticated with google')
 
@@ -20,7 +20,7 @@ export function AdminUser (options?: { required?: boolean }) {
         admin.googleAuth.token = newBearer.token
         admin.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
         await userRepo.saveWithValidation(admin)
-        await userRepo.removeAdminFromCache() // Uncache the admin so it changes later on
+        await userRepo.removeSuperAdminFromCache() // Uncache the admin so it changes later on
       }
 
       return admin

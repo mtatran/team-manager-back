@@ -1,11 +1,12 @@
-import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam } from 'routing-controllers'
+import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam, QueryParams } from 'routing-controllers'
 import GoogleService, { DriveListOptions } from '../services/googleService'
 import { listResponse } from '../presentations/googlePresentation'
 import { User } from '../models/user'
 import { GoogleAuthentication } from '../models/googleAuthentication'
-import { OAuthBearer } from '../types'
+import { OAuthBearer, Authority } from '../types'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
+import { AdminUser } from './parameter-decorators/index'
 
 interface AuthedUser extends User {
   googleAuth: GoogleAuthentication
@@ -89,7 +90,7 @@ export default class GoogleController {
    * @apiParam {Integer} [pageToken] Page token for requesting a certain page
    */
   @Get('/files')
-  @Authorized(['google'])
+  @Authorized({ google: true })
   async getFiles (
     @CurrentUser({ required: true }) user: AuthedUser,
     @QueryParam('pageSize') pageSize: string = '50',
@@ -104,5 +105,39 @@ export default class GoogleController {
 
     const results = await GoogleService.getListOfFiles(user.googleAuth as OAuthBearer, options)
     return listResponse(results)
+  }
+
+  @Get('/files/admin')
+  @Authorized({ admin: true })
+  async getFilesAsAdmin (
+    @QueryParam('pageSize') pageSize: string = '50',
+    @QueryParam('q') q: string,
+    @QueryParam('pageToken') pageToken: string,
+    @AdminUser() admin: AuthedUser
+  ) {
+    const options: DriveListOptions = {
+      pageSize: parseInt(pageSize, 10),
+      q,
+      pageToken
+    }
+
+    const results = await GoogleService.getListOfFiles(admin.googleAuth, options)
+    return listResponse(results)
+  }
+
+  @Get('/token')
+  @Authorized({ google: true })
+  async getAccountToken (
+    @CurrentUser() user: AuthedUser
+  ) {
+    return { token: user.googleAuth.token }
+  }
+
+  @Get('/token/admin')
+  @Authorized({ admin: true })
+  async getAdminAccountToken (
+    @AdminUser({ required: true }) admin: AuthedUser
+  ) {
+    return { token: admin.googleAuth.token }
   }
 }
