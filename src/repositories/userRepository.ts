@@ -28,9 +28,9 @@ export class UserRepository extends BaseRepository<User> {
     })
   }
 
-  async getAdminUser () {
+  async getSuperAdminUser () {
     const admin = await this.findOne({
-      where: { authority: Authority.admin },
+      where: { authority: Authority.superAdmin },
       cache: { milliseconds: 6000000, id: 'admin_user'}
     })
 
@@ -38,7 +38,7 @@ export class UserRepository extends BaseRepository<User> {
     return admin
   }
 
-  async removeAdminFromCache () {
+  async removeSuperAdminFromCache () {
     const queryResultCache = getConnection().queryResultCache
     if (queryResultCache) await queryResultCache.remove(['admin_user'])
   }
