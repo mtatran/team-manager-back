@@ -1,6 +1,5 @@
 import { FilePermission } from '../../types'
 
-
 export interface TokenResponse {
   access_token: string
   expires_in: number
@@ -48,7 +47,7 @@ export interface DriveListResponse {
 }
 
 export interface AddPermissionOptions {
-  emailMessage: string
-  sendNotificationEmails: boolean
-  transferOwnership: boolean
+  emailMessage?: string
+  sendNotificationEmails?: boolean
+  transferOwnership?: boolean
 }
