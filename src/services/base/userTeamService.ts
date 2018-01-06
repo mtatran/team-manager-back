@@ -2,12 +2,12 @@ import { User } from '../../models/user'
 import { Team } from '../../models/team'
 
 export abstract class UserTeamService {
-  abstract teamCreated (team: Team)
-  abstract userCreated (user: User)
+  teamCreated (team: Team) { return }
+  userCreated (user: User) { return }
 
-  abstract teamDeleted (team: Team)
-  abstract userDeleted (user: User)
+  teamDeleted (team: Team) { return }
+  userDeleted (user: User) { return }
 
-  abstract userAddedToTeam (user: User, team: Team)
-  abstract userRemovedFromTeam (user: User, team: Team)
+  userAddedToTeam (user: User, team: Team) { return }
+  userRemovedFromTeam (user: User, team: Team) { return }
 }

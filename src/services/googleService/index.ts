@@ -17,9 +17,12 @@ import {
 } from './types'
 import { AUTH_TOKEN_URL, FILE_LIST_URL, USER_REDIRECT } from './constants'
 export * from './types'
+import { UserTeamService } from '../base/userTeamService'
 import DriveClient from './driveClient'
+import { Team } from '../../models/team'
+import { User } from '../../models/user'
 
-class GoogleService {
+class GoogleService extends UserTeamService {
   /**
    * Generates the URL that users should be redirected to the initiate
    * the OAuth2 process
@@ -95,6 +98,25 @@ class GoogleService {
     })
 
     return Promise.all(permissionPromises as any)
+  }
+
+  teamCreated (team: Team) { return }
+  userCreated (user: User) { return }
+
+  teamDeleted (team: Team) {
+    return
+  }
+
+  userDeleted (user: User) {
+    return
+  }
+
+  userAddedToTeam (user: User, team: Team) {
+    return
+  }
+
+  userRemovedFromTeam (user: User, team: Team) {
+    return
   }
 
 }
