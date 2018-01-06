@@ -32,10 +32,32 @@ export interface OAuthBearerWithRefresh extends OAuthBearer {
 }
 
 export enum FilePermission {
-  none,
-  reader,
-  writer,
-  owner
+  none = 'none',
+  reader = 'reader',
+  writer = 'writer',
+  owner = 'owner'
+}
+
+export namespace FilePermission {
+  export function permissionToNumber (permission: FilePermission) {
+    switch (permission) {
+      case FilePermission.none: return 0
+      case FilePermission.reader: return 1
+      case FilePermission.writer: return 2
+      case FilePermission.owner: return 3
+      default: throw new Error(`${permission} is not a valid FilePermission`)
+    }
+  }
+
+  export function numberToPermission (num: number) {
+    switch (num) {
+      case 0: return FilePermission.none
+      case 1: return FilePermission.reader
+      case 2: return FilePermission.writer
+      case 3: return FilePermission.owner
+      default: throw new Error(`${num} is not a valid FilePermission level`)
+    }
+  }
 }
 
 interface FilePermissionBaseAction {

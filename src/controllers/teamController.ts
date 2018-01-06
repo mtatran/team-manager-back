@@ -1,5 +1,5 @@
 
-import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams } from 'routing-controllers'
+import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams, Authorized, InternalServerError } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
@@ -124,7 +124,7 @@ export default class UserController {
   }
 
   /**
-   * @api {POST} /teams/:teamId/file Add file to team
+   * @api {POST} /teams/:teamId/files Add file to team
    * @apiName addFileToTeam
    * @apiGroup Teams
    * @apiVersion 1.0.0
@@ -138,27 +138,32 @@ export default class UserController {
       permission: "reader"
     }
    */
-  @Post('/:teamId/file')
+  @Post('/:teamId/files')
+  @Authorized({ google: true })
   async addFileToTeam (
-    @CurrentUser() admin: User,
-    @AdminUser() user: User,
+    @CurrentUser() user: User,
+    @AdminUser() admin: User,
     @Param('teamId') teamId: string,
-    @BodyParam('permission') permission: string,
-    @BodyParam('fileId') fileId: string
+    @BodyParam('permission', { required: true }) permission: string,
+    @BodyParam('fileId', { required: true }) fileId: string
   ) {
-    const team: Team = await teamService.findOneById(teamId)
+    const team: Team = await teamService.findOneByIdWithUsers(teamId)
 
     if (!(permission in FilePermission)) {
       throw new BadRequestError('Permission must be reader or writer')
     }
 
     // Transfer file to admin owner
-    await GoogleService.giveEmailFilePermission(
+    try {
+      await GoogleService.giveEmailFilePermission(
         user.googleAuth as OAuthBearer,
         fileId,
         admin.email,
         FilePermission.owner
       )
+    } catch (e) {
+      throw new InternalServerError(e.message)
+    }
 
     const file = new File()
     file.fileId = fileId
@@ -183,7 +188,7 @@ export default class UserController {
   }
 
   /**
-   * @api {DELETE} /teams/:teamId/file/:fileId Add file to team
+   * @api {DELETE} /teams/:teamId/files/:fileId Add file to team
    * @apiName addFileToTeam
    * @apiGroup Teams
    * @apiVersion 1.0.0
@@ -191,7 +196,7 @@ export default class UserController {
    * @apiParam {String} teamId Should be the valid mongodb team id
    * @apiParam {String} fileId Should be the file id from google drive
    */
-  @Delete('/:teamId/file/:fileId')
+  @Delete('/:teamId/files/:fileId')
   async removeFileFromTeam (
     @AdminUser() admin: User,
     @Param('teamId') teamId: string,
@@ -250,6 +255,13 @@ export default class UserController {
   }
 
   private getMaxPermission (permissions: FilePermission[]) {
-    return permissions.reduce((pre, curr) => Math.max(pre, curr), FilePermission.none)
+    const permissionsAsNum = permissions.map(FilePermission.permissionToNumber)
+
+    const max = permissionsAsNum.reduce(
+      (pre, curr) => Math.max(pre, curr),
+      FilePermission.permissionToNumber(FilePermission.none)
+    )
+
+    return FilePermission.numberToPermission(max)
   }
 }

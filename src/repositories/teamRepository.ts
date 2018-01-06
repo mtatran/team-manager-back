@@ -15,4 +15,16 @@ export class TeamRepository extends BaseRepository<Team> {
       }
     })
   }
+
+  findOneByIdWithUsers (id: number | string) {
+    return this.findOneById(id, {
+      join: {
+        alias: 'team',
+        leftJoinAndSelect: {
+          'positions': 'team.positions',
+          'user': 'positions.user'
+        }
+      }
+    })
+  }
 }

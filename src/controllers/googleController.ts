@@ -77,54 +77,6 @@ export default class GoogleController {
     return { authenticated: isAuthed }
   }
 
-  /**
-   * @api {GET} /google/files Get drive files
-   * @apiName googleGetFiles
-   * @apiGroup google
-   * @apiVersion  1.0.0
-   *
-   * @apiUse success_google_list_response
-   *
-   * @apiParam {Integer} [pageSize] Maximum documents responded
-   * @apiParam {string} [q] Search Query
-   * @apiParam {Integer} [pageToken] Page token for requesting a certain page
-   */
-  @Get('/files')
-  @Authorized({ google: true })
-  async getFiles (
-    @CurrentUser({ required: true }) user: AuthedUser,
-    @QueryParam('pageSize') pageSize: string = '50',
-    @QueryParam('q') q: string,
-    @QueryParam('pageToken') pageToken: string
-  ) {
-    const options: DriveListOptions = {
-      pageSize: parseInt(pageSize, 10),
-      q,
-      pageToken
-    }
-
-    const results = await GoogleService.getListOfFiles(user.googleAuth as OAuthBearer, options)
-    return listResponse(results)
-  }
-
-  @Get('/files/admin')
-  @Authorized({ admin: true })
-  async getFilesAsAdmin (
-    @QueryParam('pageSize') pageSize: string = '50',
-    @QueryParam('q') q: string,
-    @QueryParam('pageToken') pageToken: string,
-    @AdminUser() admin: AuthedUser
-  ) {
-    const options: DriveListOptions = {
-      pageSize: parseInt(pageSize, 10),
-      q,
-      pageToken
-    }
-
-    const results = await GoogleService.getListOfFiles(admin.googleAuth, options)
-    return listResponse(results)
-  }
-
   @Get('/token')
   @Authorized({ google: true })
   async getAccountToken (
