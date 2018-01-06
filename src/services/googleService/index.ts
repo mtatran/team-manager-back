@@ -5,6 +5,8 @@
  * https://developers.google.com/drive/v2/reference/files#resource
  */
 import * as qs from 'qs'
+import * as assert from 'assert'
+import * as _ from 'lodash'
 import { OAuthBearer, FilePermission, FilePermissionAction } from '../../types'
 import {
   AddPermissionOptions,
@@ -21,6 +23,9 @@ import { UserTeamService } from '../base/userTeamService'
 import DriveClient from './driveClient'
 import { Team } from '../../models/team'
 import { User } from '../../models/user'
+import { getCustomRepository } from 'typeorm'
+import { UserRepository } from '../../repositories/userRepository'
+import { FileRepository } from '../../repositories/fileRepository'
 
 class GoogleService extends UserTeamService {
   /**
@@ -100,23 +105,77 @@ class GoogleService extends UserTeamService {
     return Promise.all(permissionPromises as any)
   }
 
-  teamCreated (team: Team) { return }
-  userCreated (user: User) { return }
+  /**
+   * The team must have users array filled
+   */
+  beforeTeamDelete (team: Team) {
+    assert(team.positions, 'team does not contain poisitions')
 
-  teamDeleted (team: Team) {
-    return
   }
 
-  userDeleted (user: User) {
-    return
+  private async getAdminOAuth (): Promise<OAuthBearer> {
+    const admin = await getCustomRepository(UserRepository).getSuperAdminUser()
+    assert(admin, 'Super admin currently does not exist')
+    assert(admin.googleAuth, 'Super admin is not authenticated to google')
+
+    return admin.googleAuth as any
   }
 
-  userAddedToTeam (user: User, team: Team) {
-    return
+  /**
+   * Permissions might need to be recalculated for each time a team changes. If the user
+   * is granted permissions from another team, we don't want to accidentally overwrite
+   * their permissions or send them an annoying email
+   */
+  private async getFilePermissionChanges (users: User[], fileId: string) {
+    const adminOAuth = await this.getAdminOAuth()
+
+    // Get permissions for the current file
+    const driveFilePermissions = await this.getPermissionFromFile(adminOAuth, fileId)
+
+    // Turn permissions into a email hashmap { email: { role: '', id: '', email: '' } }
+    const drivePermissionMap: {[key: string]: DriveFilePermission} = driveFilePermissions.reduce(
+      (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr}),
+      {}
+    )
+
+    const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
+    const uniqueTeamIds = _.union(...teamIds)
+    const teamFilePermissions = await getCustomRepository(FileRepository).find({
+      where: { team: uniqueTeamIds, fileId }
+    })
+    const changeActionArray: FilePermissionAction[] = []
+
+    users.forEach(user => {
+      const userTeamIds = user.positions.map(pos => pos.teamId)
+      const applicablePermissions = teamFilePermissions
+        .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
+        .map(file => file.permission)
+
+      const currentPermission = drivePermissionMap[user.email.toLowerCase()]
+      const maxGivenPermission = this.getMaxPermission(applicablePermissions)
+
+      if (maxGivenPermission === currentPermission.role) return
+      if (maxGivenPermission === FilePermission.none) {
+        changeActionArray.push({ action: 'delete', permissionId: currentPermission.id, fileId })
+      } else if (currentPermission.role === FilePermission.none) {
+        changeActionArray.push({ action: 'create', newPermission: maxGivenPermission, email: user.email, fileId})
+      } else {
+        changeActionArray.push({ action: 'change', newPermission: maxGivenPermission, fileId, permissionId: currentPermission.id })
+      }
+    })
+
+    return changeActionArray
   }
 
-  userRemovedFromTeam (user: User, team: Team) {
-    return
+  private getMaxPermission (permissions: FilePermission[]) {
+    const permissionsAsNum = permissions.map(FilePermission.permissionToNumber)
+
+    const max = permissionsAsNum.reduce(
+      (pre, curr) => Math.max(pre, curr),
+      FilePermission.permissionToNumber(FilePermission.none)
+    )
+
+    return FilePermission.numberToPermission(max)
   }
 
 }
