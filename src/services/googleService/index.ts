@@ -23,9 +23,13 @@ import { UserTeamService } from '../base/userTeamService'
 import DriveClient from './driveClient'
 import { Team } from '../../models/team'
 import { User } from '../../models/user'
-import { getCustomRepository } from 'typeorm'
+import { getCustomRepository, getRepository, getConnectionManager } from 'typeorm'
 import { UserRepository } from '../../repositories/userRepository'
 import { FileRepository } from '../../repositories/fileRepository'
+import { race } from 'q'
+import { File } from '../../models/file'
+import { Position } from '../../models/position'
+import { SelectQueryBuilder } from 'typeorm/query-builder/SelectQueryBuilder'
 
 class GoogleService extends UserTeamService {
   /**
@@ -46,7 +50,7 @@ class GoogleService extends UserTeamService {
   /**
    * Check to see if the auth object is currently authenticated
    */
-  isAuthenticated (auth: OAuthBearer): boolean {
+  isTokenValid (auth: OAuthBearer): boolean {
     return 'token' in auth && auth.tokenExpireDate.getTime() > Date.now()
   }
 
@@ -55,6 +59,21 @@ class GoogleService extends UserTeamService {
    */
   async reauthenticate (auth: OAuthBearer): Promise<OAuthBearer> {
     return DriveClient.getAuthTokenFromCode(auth.refreshToken, true)
+  }
+
+  /**
+   * Refresh user oauth token
+   */
+  async refreshUserOAuthToken (user: User, saveToServer = true): Promise<User> {
+    if (!user.googleAuth) throw new Error('User must be already authenticated to google')
+
+    const newToken = await this.reauthenticate(user.googleAuth)
+    user.googleAuth.token = newToken.token
+    user.googleAuth.tokenExpireDate = newToken.tokenExpireDate
+
+    if (saveToServer) await getCustomRepository(UserRepository).save(user)
+
+    return user
   }
 
   /**
@@ -82,8 +101,8 @@ class GoogleService extends UserTeamService {
   }
 
   async getPermissionFromFile (auth: OAuthBearer, fileId: string): Promise<DriveFilePermission[]> {
-    return new DriveClient(auth)
-      .getFilePermission(fileId) as any
+    const data = await new DriveClient(auth).getFilePermission(fileId)
+    return data.permissions as any
   }
 
   async updatePermissionForFile (auth: OAuthBearer, fileId: string, permissionId: string, permission: FilePermission) {
@@ -105,20 +124,53 @@ class GoogleService extends UserTeamService {
     return Promise.all(permissionPromises as any)
   }
 
-  /**
-   * The team must have users array filled
-   */
   beforeTeamDelete (team: Team) {
-    assert(team.positions, 'team does not contain poisitions')
-
+    const users = team.positions.map(pos => pos.user)
+    this.getFilePermissionChanges(users, '0B2_zix-T-cLPNktuRGRaTUotbUU')
   }
 
   private async getAdminOAuth (): Promise<OAuthBearer> {
-    const admin = await getCustomRepository(UserRepository).getSuperAdminUser()
+    let admin = await getCustomRepository(UserRepository).getSuperAdminUser()
     assert(admin, 'Super admin currently does not exist')
     assert(admin.googleAuth, 'Super admin is not authenticated to google')
 
-    return admin.googleAuth as any
+    if (!this.isTokenValid(admin.googleAuth as OAuthBearer)) {
+      admin = await this.refreshUserOAuthToken(admin)
+    }
+
+    return admin.googleAuth as OAuthBearer
+  }
+
+  private async getUsersPermissionsForFile (user: User[], fileId: string, excludeTeamId?: string) {
+    let query: any = getRepository(User).createQueryBuilder('user')
+      .select('user.id')
+      .whereInIds(user.map(v => v.id))
+      .leftJoin('user.positions', 'positions')
+
+    if (excludeTeamId) {
+      query = query.leftJoin('positions.team', 'team', 'team.id != :teamId', { teamId: excludeTeamId })
+    } else {
+      query = query.leftJoin('positions.team', 'team')
+    }
+
+    query = query.leftJoin('team.files', 'file', 'file.fileId = :fileId', { fileId })
+      .addSelect('file.permission')
+      .getMany()
+
+    const data: User[] = await query
+
+    const usersMap: {[key: number]: FilePermission[]} = data.reduce((pre, user: User) => {
+      const userId = user.id
+
+      const filesPermission = user.positions.reduce((pre: FilePermission[], curr) => {
+        const teamFiles = curr.team.files.map(f => f.permission)
+        return pre.concat(teamFiles)
+      }, [])
+
+      return {...pre, [userId]: filesPermission}
+    }, {})
+
+    return usersMap
   }
 
   /**
@@ -138,33 +190,37 @@ class GoogleService extends UserTeamService {
       {}
     )
 
-    const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
-    const uniqueTeamIds = _.union(...teamIds)
-    const teamFilePermissions = await getCustomRepository(FileRepository).find({
-      where: { team: uniqueTeamIds, fileId }
-    })
-    const changeActionArray: FilePermissionAction[] = []
+    const usersFilePermissions = await this.getUsersPermissionsForFile(users, fileId)
+    console.log(usersFilePermissions)
 
-    users.forEach(user => {
-      const userTeamIds = user.positions.map(pos => pos.teamId)
-      const applicablePermissions = teamFilePermissions
-        .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
-        .map(file => file.permission)
+    // const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
+    // const uniqueTeamIds = _.union(...teamIds)
+    // const teamFilePermissions = await getCustomRepository(FileRepository).find({
+    //   where: { team: uniqueTeamIds, fileId }
+    // })
 
-      const currentPermission = drivePermissionMap[user.email.toLowerCase()]
-      const maxGivenPermission = this.getMaxPermission(applicablePermissions)
+    // const changeActionArray: FilePermissionAction[] = []
 
-      if (maxGivenPermission === currentPermission.role) return
-      if (maxGivenPermission === FilePermission.none) {
-        changeActionArray.push({ action: 'delete', permissionId: currentPermission.id, fileId })
-      } else if (currentPermission.role === FilePermission.none) {
-        changeActionArray.push({ action: 'create', newPermission: maxGivenPermission, email: user.email, fileId})
-      } else {
-        changeActionArray.push({ action: 'change', newPermission: maxGivenPermission, fileId, permissionId: currentPermission.id })
-      }
-    })
+    // users.forEach(user => {
+    //   const userTeamIds = user.positions.map(pos => pos.teamId)
+    //   const applicablePermissions = teamFilePermissions
+    //     .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
+    //     .map(file => file.permission)
 
-    return changeActionArray
+    //   const currentPermission = drivePermissionMap[user.email.toLowerCase()]
+    //   const maxGivenPermission = this.getMaxPermission(applicablePermissions)
+
+    //   if (maxGivenPermission === currentPermission.role) return
+    //   if (maxGivenPermission === FilePermission.none) {
+    //     changeActionArray.push({ action: 'delete', permissionId: currentPermission.id, fileId })
+    //   } else if (currentPermission.role === FilePermission.none) {
+    //     changeActionArray.push({ action: 'create', newPermission: maxGivenPermission, email: user.email, fileId})
+    //   } else {
+    //     changeActionArray.push({ action: 'change', newPermission: maxGivenPermission, fileId, permissionId: currentPermission.id })
+    //   }
+    // })
+
+    // return changeActionArray
   }
 
   private getMaxPermission (permissions: FilePermission[]) {
@@ -177,7 +233,6 @@ class GoogleService extends UserTeamService {
 
     return FilePermission.numberToPermission(max)
   }
-
 }
 
 export default new GoogleService()

@@ -35,7 +35,7 @@ export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
 
     if (!user.googleAuth) return false
 
-    const isGoogleAuthenticated = GoogleService.isAuthenticated(user.googleAuth)
+    const isGoogleAuthenticated = GoogleService.isTokenValid(user.googleAuth)
 
     if (!isGoogleAuthenticated) {
       const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)

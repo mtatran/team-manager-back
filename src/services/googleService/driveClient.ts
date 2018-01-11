@@ -92,8 +92,8 @@ export default class DriveClient {
       type: 'user',
       emailAddress: email
     }
-
-    return (await this.getAuthedAxios()).post(url, body)
+    const axios = await this.getAuthedAxios()
+    return axios.post(url, body)
   }
 
   /**
@@ -105,7 +105,8 @@ export default class DriveClient {
       fields: 'permissions(role,emailAddress,id)'
     }
 
-    return (await this.getAuthedAxios()).get(`${url}?${qs.stringify(query)}`)
+    const axios = await this.getAuthedAxios()
+    return (await axios.get(`${url}?${qs.stringify(query)}`)).data
   }
 
   /**
@@ -113,7 +114,8 @@ export default class DriveClient {
    */
   async removeFilePermision (file: string, permissionId: string) {
     const url = `https://www.googleapis.com/drive/v2/files${file}/permissions/${permissionId}`
-    return (await this.getAuthedAxios()).delete(url)
+    const axios = await this.getAuthedAxios()
+    return axios.delete(url)
   }
 
   /**
@@ -123,7 +125,8 @@ export default class DriveClient {
     const url = `https://www.googleapis.com/drive/v3/files/${file}/permissions/${permissionId}`
 
     const body = { role: permission }
-    return (await this.getAuthedAxios()).patch(url, body)
+    const axios = await this.getAuthedAxios()
+    return axios.patch(url, body)
   }
 
   /**
