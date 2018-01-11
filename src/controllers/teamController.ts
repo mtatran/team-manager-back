@@ -2,6 +2,7 @@
 import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams, Authorized, InternalServerError } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
+import { log } from '../utils/log'
 import GoogleService, { DriveFilePermission } from '../services/googleService'
 import { Team } from '../models/team'
 import { File } from '../models/file'
@@ -110,6 +111,14 @@ export default class UserController {
     })
   }
 
+  @Get('/:teamId/test')
+  async test (
+    @Param('teamId') teamId: string
+  ) {
+    const team = await teamService.findOneByIdWithUsers(teamId)
+    GoogleService.beforeTeamDelete(team)
+  }
+
   /**
    * @api {GET} /teams/:teamId Get Team Info
    * @apiName getTeam
@@ -162,6 +171,7 @@ export default class UserController {
         FilePermission.owner
       )
     } catch (e) {
+      log.error(e)
       throw new InternalServerError(e.message)
     }
 
@@ -181,9 +191,14 @@ export default class UserController {
           FilePermission[permission],
           { emailMessage: `A new file has been added to the Waterloop team: ${team.name}` }
         )
-      ))
+    ))
 
-    await Promise.all(promises)
+    try {
+      await Promise.all(promises)
+    } catch (e) {
+      log.error(e)
+      throw new InternalServerError(e.message)
+    }
     return null
   }
 

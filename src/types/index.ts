@@ -27,10 +27,6 @@ export interface OAuthBearer {
   tokenExpireDate: Date
 }
 
-export interface OAuthBearerWithRefresh extends OAuthBearer {
-  refreshToken: string
-}
-
 export enum FilePermission {
   none = 'none',
   reader = 'reader',

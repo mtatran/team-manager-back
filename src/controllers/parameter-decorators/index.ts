@@ -13,7 +13,7 @@ export function AdminUser (options?: { required?: boolean }) {
 
       if (!admin.googleAuth) throw new InternalServerError('Admin has not been authenticated with google')
 
-      const isGoogleAuthenticated = GoogleService.isAuthenticated(admin.googleAuth)
+      const isGoogleAuthenticated = GoogleService.isTokenValid(admin.googleAuth)
 
       if (!isGoogleAuthenticated) {
         const newBearer: OAuthBearer = await GoogleService.reauthenticate(admin.googleAuth)

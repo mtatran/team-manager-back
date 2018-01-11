@@ -73,7 +73,7 @@ export default class GoogleController {
   */
   @Get('/isAuthenticated')
   isAuthenticated (@CurrentUser() user: User) {
-    const isAuthed = user.googleAuth !== undefined && GoogleService.isAuthenticated(user.googleAuth)
+    const isAuthed = user.googleAuth !== undefined && GoogleService.isTokenValid(user.googleAuth)
     return { authenticated: isAuthed }
   }
 
