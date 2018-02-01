@@ -1,5 +1,5 @@
 import { createParamDecorator, InternalServerError } from 'routing-controllers'
-import GoogleService from '../../services/googleService'
+import { googleService } from '../../services/googleService'
 import { OAuthBearer } from '../../types'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../../repositories/userRepository'
@@ -13,10 +13,10 @@ export function AdminUser (options?: { required?: boolean }) {
 
       if (!admin.googleAuth) throw new InternalServerError('Admin has not been authenticated with google')
 
-      const isGoogleAuthenticated = GoogleService.isTokenValid(admin.googleAuth)
+      const isGoogleAuthenticated = googleService.isTokenValid(admin.googleAuth)
 
       if (!isGoogleAuthenticated) {
-        const newBearer: OAuthBearer = await GoogleService.reauthenticate(admin.googleAuth)
+        const newBearer: OAuthBearer = await googleService.reauthenticate(admin.googleAuth)
         admin.googleAuth.token = newBearer.token
         admin.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
         await userRepo.saveWithValidation(admin)

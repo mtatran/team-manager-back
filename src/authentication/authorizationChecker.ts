@@ -4,7 +4,7 @@ import { verify } from 'jsonwebtoken'
 import { JwtToken, Authority, Roles, OAuthBearer } from '../types/index'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
-import GoogleService from '../services/googleService'
+import { googleService } from '../services/googleService'
 
 export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
   const roles: Roles = rolesArg[0] || {}
@@ -35,10 +35,10 @@ export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
 
     if (!user.googleAuth) return false
 
-    const isGoogleAuthenticated = GoogleService.isTokenValid(user.googleAuth)
+    const isGoogleAuthenticated = googleService.isTokenValid(user.googleAuth)
 
     if (!isGoogleAuthenticated) {
-      const newBearer: OAuthBearer = await GoogleService.reauthenticate(user.googleAuth)
+      const newBearer: OAuthBearer = await googleService.reauthenticate(user.googleAuth)
       user.googleAuth.token = newBearer.token
       user.googleAuth.tokenExpireDate = newBearer.tokenExpireDate
       await userRepo.saveWithValidation(user)
