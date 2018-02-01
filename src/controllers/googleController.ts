@@ -1,5 +1,5 @@
 import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam } from 'routing-controllers'
-import GoogleService from '../services/googleService'
+import { googleService } from '../services/googleService'
 import { User } from '../models/user'
 import { GoogleAuthentication } from '../models/googleAuthentication'
 import { getCustomRepository } from 'typeorm'
@@ -23,7 +23,7 @@ export default class GoogleController {
   @Get('/redirect')
   @Redirect('useless-string') // Need to not be an empty string
   redirectToGoogle () {
-    let authUrl = GoogleService.getAuthUrl()
+    let authUrl = googleService.getAuthUrl()
     return authUrl
   }
 
@@ -46,7 +46,7 @@ export default class GoogleController {
   ) {
     if ( error ) throw new BadRequestError(error)
 
-    const bearer = await GoogleService.onAuthSuccess(code)
+    const bearer = await googleService.onAuthSuccess(code)
 
     if (user.googleAuth && user.googleAuth.refreshToken && !bearer.refreshToken) {
       throw new BadRequestError('Do not need to reauthenticate to google')
@@ -71,7 +71,7 @@ export default class GoogleController {
   */
   @Get('/isAuthenticated')
   isAuthenticated (@CurrentUser() user: User) {
-    const isAuthed = user.googleAuth !== undefined && GoogleService.isTokenValid(user.googleAuth)
+    const isAuthed = user.googleAuth !== undefined && googleService.isTokenValid(user.googleAuth)
     return { authenticated: isAuthed }
   }
 
