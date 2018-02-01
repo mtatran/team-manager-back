@@ -113,7 +113,7 @@ export default class DriveClient {
    * Remove permissions from a file
    */
   async removeFilePermision (file: string, permissionId: string) {
-    const url = `https://www.googleapis.com/drive/v2/files${file}/permissions/${permissionId}`
+    const url = `https://www.googleapis.com/drive/v2/files/${file}/permissions/${permissionId}`
     const axios = await this.getAuthedAxios()
     return axios.delete(url)
   }
