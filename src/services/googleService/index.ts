@@ -82,10 +82,10 @@ class GoogleService extends UserTeamService {
   async giveEmailFilePermission (
     auth: OAuthBearer,
     fileId: string,
-     email: string,
-     permission: FilePermission,
-     options: Partial<AddPermissionOptions> = {}): Promise<string> {
-
+    email: string,
+    permission: FilePermission,
+    options: Partial<AddPermissionOptions> = {}
+  ): Promise<string> {
     const data = await new DriveClient(auth)
         .addFilePermission(fileId, email, permission, options)
 
@@ -110,7 +110,8 @@ class GoogleService extends UserTeamService {
       .updateFilePermission(fileId, permissionId, permission)
   }
 
-  saveFilePermissionActions (auth: OAuthBearer, actions: FilePermissionAction[]) {
+  async saveFilePermissionActions (actions: FilePermissionAction[]) {
+    const auth = await this.getAdminOAuth()
     let permissionPromises = actions.map(action => {
       if (action.action === 'create') {
         return this.giveEmailFilePermission(auth, action.fileId, action.email, action.newPermission)
@@ -124,9 +125,39 @@ class GoogleService extends UserTeamService {
     return Promise.all(permissionPromises as any)
   }
 
-  beforeTeamDelete (team: Team) {
+  async beforeTeamDelete (team: Team) {
     const users = team.positions.map(pos => pos.user)
-    this.getFilePermissionChanges(users, '0B2_zix-T-cLPNktuRGRaTUotbUU')
+    let permissionChangeArray: FilePermissionAction[] = []
+
+    team.files.forEach(async file => {
+      const permissionChanges = await this.getFilePermissionChanges(users, file.fileId, team.id)
+      permissionChangeArray.concat(permissionChanges)
+    })
+
+    return this.saveFilePermissionActions(permissionChangeArray)
+  }
+
+  userAddedToTeam (user: User, team: Team) {
+    return this.userStatusWithTeamChanged(user, team)
+  }
+
+  userRemovedFromTeam (user: User, team: Team) {
+    return this.userStatusWithTeamChanged(user, team)
+  }
+  /**
+   * Sees if there should be any permission changes for all the files
+   * contained in team for user
+   */
+  async userStatusWithTeamChanged (user: User, team: Team) {
+    // We get all permission changes for each file in team
+    let permissionChangeArray: FilePermissionAction[] = []
+
+    const promises = team.files.map(async file => {
+      const permissionChanges = await this.getFilePermissionChanges([ user ], file.fileId)
+      permissionChangeArray.push(...permissionChanges)
+    })
+    await Promise.all(promises)
+    return this.saveFilePermissionActions(permissionChangeArray)
   }
 
   private async getAdminOAuth (): Promise<OAuthBearer> {
@@ -141,7 +172,7 @@ class GoogleService extends UserTeamService {
     return admin.googleAuth as OAuthBearer
   }
 
-  private async getUsersPermissionsForFile (user: User[], fileId: string, excludeTeamId?: string) {
+  private async getUsersPermissionsForFile (user: User[], fileId: string, excludeTeamId?: number) {
     let query: any = getRepository(User).createQueryBuilder('user')
       .select('user.id')
       .whereInIds(user.map(v => v.id))
@@ -160,14 +191,12 @@ class GoogleService extends UserTeamService {
     const data: User[] = await query
 
     const usersMap: {[key: number]: FilePermission[]} = data.reduce((pre, user: User) => {
-      const userId = user.id
-
       const filesPermission = user.positions.reduce((pre: FilePermission[], curr) => {
         const teamFiles = curr.team.files.map(f => f.permission)
         return pre.concat(teamFiles)
       }, [])
 
-      return {...pre, [userId]: filesPermission}
+      return {...pre, [user.id]: filesPermission}
     }, {})
 
     return usersMap
@@ -178,49 +207,70 @@ class GoogleService extends UserTeamService {
    * is granted permissions from another team, we don't want to accidentally overwrite
    * their permissions or send them an annoying email
    */
-  private async getFilePermissionChanges (users: User[], fileId: string) {
+  private async getFilePermissionChanges (users: User[], fileId: string, excludeTeamId?: number) {
     const adminOAuth = await this.getAdminOAuth()
 
-    // Get permissions for the current file
+    /**
+     * File permissions for users for the file in google drive
+     */
     const driveFilePermissions = await this.getPermissionFromFile(adminOAuth, fileId)
 
-    // Turn permissions into a email hashmap { email: { role: '', id: '', email: '' } }
-    const drivePermissionMap: {[key: string]: DriveFilePermission} = driveFilePermissions.reduce(
-      (prev, curr) => ({ ...prev, [curr.emailAddress.toLowerCase()]: curr}),
-      {}
-    )
+    let drivePermissionMap: {[email: string]: DriveFilePermission} = {}
+    /**
+     * Turn permissions into a email hashmap { email: { role: '', id: '', email: '' } }
+     */
+    driveFilePermissions.forEach((dfp) => {
+      if (!dfp.emailAddress) return // anyOneWithLink permission type
+      drivePermissionMap[dfp.emailAddress.toLowerCase()] = {
+        role: dfp.role,
+        id: dfp.id,
+        emailAddress: dfp.emailAddress
+      }
+    })
+    /**
+     * Hashmap for where the key is userId from users array and value is array of file
+     * permissions granted to the user
+     */
+    const usersFilePermissionsMap = await this.getUsersPermissionsForFile(users, fileId, excludeTeamId)
 
-    const usersFilePermissions = await this.getUsersPermissionsForFile(users, fileId)
-    console.log(usersFilePermissions)
+    const changeActionArray: FilePermissionAction[] = []
 
-    // const teamIds = users.map(user => user.positions.map(pos => pos.teamId))
-    // const uniqueTeamIds = _.union(...teamIds)
-    // const teamFilePermissions = await getCustomRepository(FileRepository).find({
-    //   where: { team: uniqueTeamIds, fileId }
-    // })
+    users.forEach(user => {
+      const currentDrivePermissionForUser = drivePermissionMap[user.email.toLowerCase()]
+      const allowedPermissions = usersFilePermissionsMap[user.id]
 
-    // const changeActionArray: FilePermissionAction[] = []
+      const maxAllowedPermission = this.getMaxPermission(allowedPermissions)
 
-    // users.forEach(user => {
-    //   const userTeamIds = user.positions.map(pos => pos.teamId)
-    //   const applicablePermissions = teamFilePermissions
-    //     .filter(file => userTeamIds.indexOf(file.teamId) >= 0)
-    //     .map(file => file.permission)
+      if (currentDrivePermissionForUser) {  // User already has some sort of permission
+        if (maxAllowedPermission === FilePermission.none) {
+          changeActionArray.push({
+            action: 'delete',
+            fileId,
+            permissionId: currentDrivePermissionForUser.id
+          })
+          return
+        }
 
-    //   const currentPermission = drivePermissionMap[user.email.toLowerCase()]
-    //   const maxGivenPermission = this.getMaxPermission(applicablePermissions)
+        if (currentDrivePermissionForUser.role !== maxAllowedPermission) {
+          changeActionArray.push({
+            action: 'change',
+            permissionId: currentDrivePermissionForUser.id,
+            newPermission: maxAllowedPermission,
+            fileId
+          })
+        }
+      } else if (maxAllowedPermission !== FilePermission.none) {
+        changeActionArray.push({
+          action: 'create',
+          newPermission: maxAllowedPermission,
+          fileId,
+          email: user.email,
+          message: `You have been given permission to this file by waterloop`
+        })
+      }
+    })
 
-    //   if (maxGivenPermission === currentPermission.role) return
-    //   if (maxGivenPermission === FilePermission.none) {
-    //     changeActionArray.push({ action: 'delete', permissionId: currentPermission.id, fileId })
-    //   } else if (currentPermission.role === FilePermission.none) {
-    //     changeActionArray.push({ action: 'create', newPermission: maxGivenPermission, email: user.email, fileId})
-    //   } else {
-    //     changeActionArray.push({ action: 'change', newPermission: maxGivenPermission, fileId, permissionId: currentPermission.id })
-    //   }
-    // })
-
-    // return changeActionArray
+    return changeActionArray
   }
 
   private getMaxPermission (permissions: FilePermission[]) {
@@ -235,4 +285,4 @@ class GoogleService extends UserTeamService {
   }
 }
 
-export default new GoogleService()
+export const googleService = new GoogleService()

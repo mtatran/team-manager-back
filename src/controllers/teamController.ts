@@ -3,7 +3,7 @@ import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestErr
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import { log } from '../utils/log'
-import GoogleService, { DriveFilePermission } from '../services/googleService'
+import { DriveFilePermission, googleService } from '../services/googleService'
 import { Team } from '../models/team'
 import { File } from '../models/file'
 import { User } from '../models/user'
@@ -116,7 +116,7 @@ export default class UserController {
     @Param('teamId') teamId: string
   ) {
     const team = await teamService.findOneByIdWithUsers(teamId)
-    GoogleService.beforeTeamDelete(team)
+    googleService.beforeTeamDelete(team)
   }
 
   /**
@@ -164,7 +164,7 @@ export default class UserController {
 
     // Transfer file to admin owner
     try {
-      await GoogleService.giveEmailFilePermission(
+      await googleService.giveEmailFilePermission(
         user.googleAuth as OAuthBearer,
         fileId,
         admin.email,
@@ -184,7 +184,7 @@ export default class UserController {
     await getCustomRepository(FileRepository).save(file)
 
     const promises = team.positions.map(pos => (
-        GoogleService.giveEmailFilePermission(
+        googleService.giveEmailFilePermission(
           admin.googleAuth as OAuthBearer,
           fileId,
           pos.user.email,
