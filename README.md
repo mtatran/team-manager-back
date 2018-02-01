@@ -12,6 +12,8 @@ Back end for managing the team
 
 **[Checkout the API documentation here](https://teamwaterloop.github.io/team-manager-back/)**
 
+**[Checkout the Frontend Repo here](https://github.com/teamwaterloop/team-manager-front/)**
+
 ## Steps to run the project
 
 ### 1. Install Dependences
