@@ -4,32 +4,20 @@
  * Resources for additional information:
  * https://developers.google.com/drive/v2/reference/files#resource
  */
-import * as qs from 'qs'
 import * as assert from 'assert'
 import * as _ from 'lodash'
 import { OAuthBearer, FilePermission, FilePermissionAction } from '../../types'
 import {
   AddPermissionOptions,
-  DriveFile,
-  DriveFileCapabilities,
-  DriveFilePermission,
-  DriveListOptions,
-  DriveListResponse,
-  TokenResponse
+  DriveFilePermission
 } from './types'
-import { AUTH_TOKEN_URL, FILE_LIST_URL, USER_REDIRECT } from './constants'
 export * from './types'
 import { UserTeamService } from '../base/userTeamService'
 import DriveClient from './driveClient'
 import { Team } from '../../models/team'
 import { User } from '../../models/user'
-import { getCustomRepository, getRepository, getConnectionManager } from 'typeorm'
+import { getCustomRepository, getRepository } from 'typeorm'
 import { UserRepository } from '../../repositories/userRepository'
-import { FileRepository } from '../../repositories/fileRepository'
-import { race } from 'q'
-import { File } from '../../models/file'
-import { Position } from '../../models/position'
-import { SelectQueryBuilder } from 'typeorm/query-builder/SelectQueryBuilder'
 
 class GoogleService extends UserTeamService {
   /**

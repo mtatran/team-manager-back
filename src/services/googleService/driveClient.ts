@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios from 'axios'
 import * as assert from 'assert'
 import * as qs from 'qs'
 import { AUTH_TOKEN_URL, USER_REDIRECT } from './constants'
@@ -48,7 +48,7 @@ export default class DriveClient {
       body.grant_type = 'authorization_code'
     }
 
-    const response = await axios.post(AUTH_TOKEN_URL, qs.stringify(body))
+    const response = await (axios.post(AUTH_TOKEN_URL, qs.stringify(body)) as any)
     const data: TokenResponse = response.data
 
     return this.transformTokenResponseToOauth(data)
@@ -106,7 +106,8 @@ export default class DriveClient {
     }
 
     const axios = await this.getAuthedAxios()
-    return (await axios.get(`${url}?${qs.stringify(query)}`)).data
+    const response = await (axios.get(`${url}?${qs.stringify(query)}`) as any)
+    return response.data
   }
 
   /**
