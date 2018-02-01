@@ -1,13 +1,13 @@
 
-import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams, Authorized, InternalServerError } from 'routing-controllers'
+import { JsonController, Get, Post, CurrentUser, Param, BodyParam, BadRequestError, Delete, QueryParams, Authorized, InternalServerError, MethodNotAllowedError } from 'routing-controllers'
 import * as _ from 'lodash'
 import { AdminUser } from './parameter-decorators'
 import { log } from '../utils/log'
-import { DriveFilePermission, googleService } from '../services/googleService'
+import { googleService } from '../services/googleService'
 import { Team } from '../models/team'
 import { File } from '../models/file'
 import { User } from '../models/user'
-import { FilePermission, OAuthBearer, PositionLevel, FilePermissionAction, ApiFindQuery } from '../types'
+import { FilePermission, OAuthBearer, PositionLevel, ApiFindQuery } from '../types'
 import { getCustomRepository } from 'typeorm'
 import { UserRepository } from '../repositories/userRepository'
 import { TeamRepository } from '../repositories/teamRepository'
@@ -116,7 +116,7 @@ export default class UserController {
     @Param('teamId') teamId: string
   ) {
     const team = await teamService.findOneByIdWithUsers(teamId)
-    googleService.beforeTeamDelete(team)
+    await googleService.beforeTeamDelete(team)
   }
 
   /**
@@ -217,11 +217,12 @@ export default class UserController {
     @Param('teamId') teamId: string,
     @Param('fileId') fileId: string
   ) {
-    const team = await teamService.findOneById(teamId)
-    team.files = team.files.filter(file => file.fileId === fileId)
+    throw new MethodNotAllowedError('This route is not implemented yet')
+    // const team = await teamService.findOneById(teamId)
+    // team.files = team.files.filter(file => file.fileId === fileId)
 
-    await getCustomRepository(TeamRepository).save(team)
-    const userIds = team.positions.map(v => v.userId)
-    const users = await getCustomRepository(UserRepository).find({ where: { id: userIds }})
+    // await getCustomRepository(TeamRepository).save(team)
+    // const userIds = team.positions.map(v => v.userId)
+    // const users = await getCustomRepository(UserRepository).find({ where: { id: userIds }})
   }
 }
