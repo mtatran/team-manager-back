@@ -100,16 +100,25 @@ class GoogleService extends UserTeamService {
       .removeFilePermision(fileId, permissionId)
   }
 
+  /**
+   * Returns currently granted permissions for the drive file
+   */
   async getPermissionFromFile (auth: OAuthBearer, fileId: string): Promise<DriveFilePermission[]> {
     const data = await new DriveClient(auth).getFilePermission(fileId)
     return data.permissions as any
   }
 
+  /**
+   * Changes the permission of the file
+   */
   async updatePermissionForFile (auth: OAuthBearer, fileId: string, permissionId: string, permission: FilePermission) {
     return new DriveClient(auth)
       .updateFilePermission(fileId, permissionId, permission)
   }
 
+  /**
+   * Executes actions given by the actions array. Will batch add/delete/update permissions
+   */
   async saveFilePermissionActions (actions: FilePermissionAction[]) {
     const auth = await this.getAdminOAuth()
     let permissionPromises = actions.map(action => {
@@ -125,6 +134,10 @@ class GoogleService extends UserTeamService {
     return Promise.all(permissionPromises as any)
   }
 
+  /**
+   * Ran before the team is deleted. This will reassess all permissions for all users and all files
+   * in the the team
+   */
   async beforeTeamDelete (team: Team) {
     const users = team.positions.map(pos => pos.user)
     let permissionChangeArray: FilePermissionAction[] = []
@@ -160,6 +173,9 @@ class GoogleService extends UserTeamService {
     return this.saveFilePermissionActions(permissionChangeArray)
   }
 
+  /**
+   * Returns the admin OAUTH token. Need to have this for authenticated actions
+   */
   private async getAdminOAuth (): Promise<OAuthBearer> {
     let admin = await getCustomRepository(UserRepository).getSuperAdminUser()
     assert(admin, 'Super admin currently does not exist')
@@ -172,6 +188,10 @@ class GoogleService extends UserTeamService {
     return admin.googleAuth as OAuthBearer
   }
 
+  /**
+   * returns a hashmap of all the permissions granted to user array for file fileId
+   * Also has the option of excluding a team by id which is used for before delete
+   */
   private async getUsersPermissionsForFile (user: User[], fileId: string, excludeTeamId?: number) {
     let query: any = getRepository(User).createQueryBuilder('user')
       .select('user.id')
