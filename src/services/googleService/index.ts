@@ -6,7 +6,12 @@
  */
 import * as assert from 'assert'
 import * as _ from 'lodash'
-import { OAuthBearer, FilePermission, FilePermissionAction } from '../../types'
+import {
+  OAuthBearer,
+  FilePermission,
+  FilePermissionAction,
+  permissionToNumber,
+  numberToPermission } from '../../types'
 import {
   AddPermissionOptions,
   DriveFilePermission
@@ -282,14 +287,14 @@ class GoogleService extends UserTeamService {
   }
 
   private getMaxPermission (permissions: FilePermission[]) {
-    const permissionsAsNum = permissions.map(FilePermission.permissionToNumber)
+    const permissionsAsNum = permissions.map(permissionToNumber)
 
     const max = permissionsAsNum.reduce(
       (pre, curr) => Math.max(pre, curr),
-      FilePermission.permissionToNumber(FilePermission.none)
+      permissionToNumber(FilePermission.none)
     )
 
-    return FilePermission.numberToPermission(max)
+    return numberToPermission(max)
   }
 }
 
