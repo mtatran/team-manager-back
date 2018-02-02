@@ -24,7 +24,7 @@ export async function authorizationChecker (action: Action, rolesArg: Roles[]) {
 
   action.request.userToken = tokenData
 
-  if (roles.admin && (tokenData.authority !== Authority.admin)) return false
+  if (roles.admin && (tokenData.authority !== Authority.admin && tokenData.authority !== Authority.superAdmin)) return false
 
   if (roles.google) {
     const userRepo = getCustomRepository(UserRepository)
