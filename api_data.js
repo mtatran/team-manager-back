@@ -156,7 +156,7 @@ define({ "api": [
   },
   {
     "type": "DELETE",
-    "url": "/teams/:teamId/file/:fileId",
+    "url": "/teams/:teamId/files/:fileId",
     "title": "Add file to team",
     "name": "addFileToTeam",
     "group": "Teams",
@@ -186,7 +186,7 @@ define({ "api": [
   },
   {
     "type": "POST",
-    "url": "/teams/:teamId/file",
+    "url": "/teams/:teamId/files",
     "title": "Add file to team",
     "name": "addFileToTeam",
     "group": "Teams",
@@ -443,70 +443,6 @@ define({ "api": [
     },
     "filename": "src/controllers/userController.ts",
     "groupTitle": "Users"
-  },
-  {
-    "type": "GET",
-    "url": "/google/files",
-    "title": "Get drive files",
-    "name": "googleGetFiles",
-    "group": "google",
-    "version": "1.0.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "pageSize",
-            "description": "<p>Maximum documents responded</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": true,
-            "field": "q",
-            "description": "<p>Search Query</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": true,
-            "field": "pageToken",
-            "description": "<p>Page token for requesting a certain page</p>"
-          }
-        ]
-      }
-    },
-    "filename": "src/controllers/googleController.ts",
-    "groupTitle": "google",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "id",
-            "description": ""
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": ""
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "canShare",
-            "description": "<p>If the user has the permission to share this folder</p>"
-          }
-        ]
-      }
-    }
   },
   {
     "type": "GET",
