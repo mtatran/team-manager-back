@@ -1,4 +1,4 @@
-import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam } from 'routing-controllers'
+import { JsonController, Redirect, Get, CurrentUser, Authorized, BadRequestError, QueryParam, Param } from 'routing-controllers'
 import { googleService } from '../services/googleService'
 import { User } from '../models/user'
 import { GoogleAuthentication } from '../models/googleAuthentication'
@@ -89,5 +89,13 @@ export default class GoogleController {
     @AdminUser({ required: true }) admin: AuthedUser
   ) {
     return { token: admin.googleAuth.token }
+  }
+
+  @Get('/file/:fileId')
+  @Authorized()
+  async getFileInformation (
+    @Param('fileId') fileId: string
+  ) {
+    return googleService.getDriveFile(fileId)
   }
 }

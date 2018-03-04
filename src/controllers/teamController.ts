@@ -107,9 +107,7 @@ export default class UserController {
   async getAllTeamsPreview () {
     const teamRepo = getCustomRepository(TeamRepository)
 
-    return teamRepo.find({
-      select: ['id', 'name']
-    })
+    return teamRepo.find({ select: ['id', 'name'] })
   }
 
   @Get('/:teamId/test')
