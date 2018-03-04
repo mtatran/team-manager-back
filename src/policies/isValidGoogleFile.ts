@@ -1,6 +1,6 @@
 // import { Request, Response, NextFunction } from 'express'
 // import { User } from '../models/user'
-// import GoogleService from '../services/googleService'
+// import { googleService } from '../services/googleService'
 // import { OAuthBearer } from '../types'
 
 // export default async (req: Request, res: Response, next: NextFunction) => {

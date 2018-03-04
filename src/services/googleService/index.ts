@@ -69,6 +69,15 @@ class GoogleService extends UserTeamService {
     return user
   }
 
+  async getDriveFile (file: string, auth?: OAuthBearer) {
+    if (auth) {
+      return new DriveClient(auth).getFile(file)
+    } else {
+      const adminAuth = await this.getAdminOAuth()
+      return new DriveClient(adminAuth).getFile(file)
+    }
+  }
+
   /**
    * Adds email with permission to file. If successful, returns the permission id
    */

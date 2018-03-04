@@ -158,31 +158,40 @@ export default class UserController {
     @BodyParam('fileId', { required: true }) fileId: string
   ) {
     const team: Team = await teamService.findOneByIdWithUsers(teamId)
+    const fileMetaData = await googleService.getDriveFile(fileId, user.googleAuth)
 
     if (!(permission in FilePermission)) {
       throw new BadRequestError('Permission must be reader or writer')
     }
 
-    // Transfer file to admin owner
-    try {
-      await googleService.giveEmailFilePermission(
-        user.googleAuth as OAuthBearer,
-        fileId,
-        admin.email,
-        FilePermission.owner
-      )
-    } catch (e) {
-      log.error(e)
-      throw new InternalServerError(e.message)
+    if (fileMetaData.owners[0].emailAddress.toLowerCase() !== admin.email.toLowerCase()) {
+      // Transfer file to admin owner
+      try {
+        await googleService.giveEmailFilePermission(
+          user.googleAuth as OAuthBearer,
+          fileId,
+          admin.email,
+          FilePermission.owner
+        )
+      } catch (e) {
+        log.error(e)
+        throw new InternalServerError(e.message)
+      }
     }
+    const fileRepository = getCustomRepository(FileRepository)
+    const existingFile = await fileRepository.findOneByTeam(fileId, team)
 
-    const file = new File()
-    file.fileId = fileId
-    file.owner = user
-    file.permission = FilePermission[permission]
-    file.team = team
-
-    await getCustomRepository(FileRepository).save(file)
+    if (existingFile) {
+      existingFile.permission = FilePermission[permission]
+      return fileRepository.saveWithValidation(existingFile)
+    } else {
+      const file = new File()
+      file.fileId = fileId
+      file.owner = user
+      file.permission = FilePermission[permission]
+      file.team = team
+      fileRepository.saveWithValidation(file)
+    }
 
     const promises = team.positions.map(pos => (
         googleService.giveEmailFilePermission(

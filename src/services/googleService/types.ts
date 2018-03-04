@@ -34,6 +34,16 @@ export interface DriveFile {
   capabilities: DriveFileCapabilities
 }
 
+export interface DriveFileWithOwner extends DriveFile {
+  owners: {
+    kind: string
+    displayName: string
+    me: boolean
+    permissionId: string
+    emailAddress: string
+  }[]
+}
+
 export interface DriveFilePermission {
   role: FilePermission
   emailAddress: string

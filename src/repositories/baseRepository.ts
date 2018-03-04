@@ -12,11 +12,11 @@ export class BaseRepository<T extends Base> extends Repository<T> {
       const errors: ValidationError[] = ([] as any).concat(...possibleErrors)
 
       if (errors.length) throw errors
-      return this.save(objs)
+      return this.save(objs as any)
     } else {
       let errors = await validate(objs, opts)
       if (errors.length) throw errors
-      return this.save(objs)
+      return this.save(objs as any)
     }
   }
 }

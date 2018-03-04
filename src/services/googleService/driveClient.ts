@@ -2,7 +2,7 @@ import axios from 'axios'
 import * as assert from 'assert'
 import * as qs from 'qs'
 import { AUTH_TOKEN_URL, USER_REDIRECT } from './constants'
-import { TokenResponse } from './types'
+import { TokenResponse, DriveFileWithOwner, DriveFile } from './types'
 import { OAuthBearer, FilePermission } from '../../types/index'
 import { AddPermissionOptions } from './index'
 const googleConfig = require('../../../client_id.json')
@@ -128,6 +128,17 @@ export default class DriveClient {
     const body = { role: permission }
     const axios = await this.getAuthedAxios()
     return axios.patch(url, body)
+  }
+
+  /**
+   * Get information on file
+   */
+  async getFile (file: string): Promise<DriveFileWithOwner> {
+    const axios = await this.getAuthedAxios()
+    const fields = 'id,name,mimeType,capabilities,owners'
+    const url = `https://www.googleapis.com/drive/v3/files/${file}?fields=${fields}`
+
+    return (await axios.get(url)).data as DriveFileWithOwner
   }
 
   /**
