@@ -38,6 +38,7 @@ export default class UserController {
      }
   */
   @Post()
+  @Authorized({ admin: true })
   async create (
     @BodyParam('name', { required: true }) name: string,
     @BodyParam('users') users: string[] |null

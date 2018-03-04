@@ -1,4 +1,4 @@
-import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined, Authorized, CurrentUser, QueryParams } from 'routing-controllers'
+import { JsonController, Get, Post, Body, Res, BodyParam, OnUndefined, Authorized, CurrentUser, QueryParams, ForbiddenError } from 'routing-controllers'
 import * as bcrypt from 'bcryptjs'
 import { User } from '../models/user'
 import { Authority, PositionLevel, ApiFindQuery } from '../types'
@@ -37,6 +37,10 @@ export default class UserController {
   @Authorized({ admin: true })
   @Post()
   async createUser (@Body() body: any) {
+    if (body.authority === Authority.superAdmin) {
+      throw new ForbiddenError('You cannot be a super admin')
+    }
+
     const user = new User()
     user.address = body.address
     user.email = body.email
@@ -45,6 +49,7 @@ export default class UserController {
     user.phoneNumber = body.phoneNumber
     user.password = await bcrypt.hash(body.password, 10)
     user.authority = body.authority || Authority.member
+    user.slackTag = body.slackTag
 
     if (body.teams) {
       const teams = await getCustomRepository(TeamRepository).findByIds(body.teams)
