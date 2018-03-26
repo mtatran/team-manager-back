@@ -28,7 +28,7 @@ If you don't you can run ```npm install -g yarn``` to get it. Sudo might be requ
 
 Copy **.env.example** and rename it **.env**
 
-Put in something random for **API_SECRET** and then set API\_URL to be http://localhost.com
+Put in something random for **API_SECRET** and then set **API\_URL** to be http://localhost.com
 (This will be the url the server thinks its hosting from and is just for testing purposes)
 
 Now OAuth authentications will redirect back to http://localhost.com but you don't own that domain.
